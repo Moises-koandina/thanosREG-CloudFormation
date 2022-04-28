@@ -1,0 +1,337 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Thanos Regional - Roles
+
+Parameters:
+  env:
+    Type: "String"
+    Description: Environment name. (dev/qa/prod)
+    Default: "dev"
+  outputArnIamRoleModels:
+    Type: "String"
+    Description: Name Rol Models
+    Default: "ArnIamRoleModels"
+  
+  outputArnIamRoleExtractor:
+    Type: "String"
+    Description: Name Rol Extractor
+    Default: "ArnIamRoleExtractor"
+  
+  outputArnIamRoleOrchest:
+    Type: "String"
+    Description: Name Rol Orchest
+    Default: "ArnIamRoleOrchest"
+
+Resources:
+  IamRoleExtractor:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        #logs
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Effect: Allow
+                Resource:
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-logsIngestPolicy
+        #network
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:CreateNetworkInterfacePermission
+                  - ec2:DeleteNetworkInterface
+                Effect: Allow
+                Resource:
+                  - "*"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-VpcIngestPolicy 
+        #dynamodb
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - dynamodb:BatchGetItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:GetItem
+                  - dynamodb:Scan
+                  - dynamodb:Query
+                  - dynamodb:PutItem
+                  - dynamodb:DescribeTable
+                  - dynamodb:UpdateItem
+                  - dynamodb:BatchWriteItem
+                Effect: Allow
+                Resource: 
+                  - "*"
+            Version: "2012-10-17"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-DynamoDBIngestPolicy
+        #sqsAction
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueUrl
+                  - sqs:AddPermission
+                  - sqs:ChangeMessageVisibility
+                  - sqs:PurgeQueue
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteQueue
+                  - sqs:SendMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:CreateQueue
+                  - sqs:SetQueueAttributes
+                Effect: Allow
+                Resource: 
+                  - !Sub "arn:aws:sqs:*:${AWS::AccountId}:*"
+            Version: "2012-10-17"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-SqsActionPolicy
+        #sqsList
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - sqs:ListQueues
+                Effect: Allow
+                Resource: 
+                  - "*"
+            Version: "2012-10-17"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-SqsListPolicy
+        #s3
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Effect: Allow
+                Resource:
+                  - !Sub "arn:aws:s3:::input-thanos-reg-${env}/*"
+                  - !Sub "arn:aws:s3:::input-thanos-reg-${env}"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-S3IngestPolicy
+        #secret manager
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - secretsmanager:*
+                Effect: Allow
+                Resource:
+                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:extractor/*
+                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:rds-db-credentials/*
+          PolicyName: !Sub KOAndina-${AWS::StackName}-SecretManagerSAPExtractorPolicy
+        #glue
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - glue:GetPartition
+                  - glue:GetPartitions
+                  - glue:CreatePartition
+                  - glue:GetTable
+                  - glue:CreateTable
+                  - glue:UpdateTable
+                  - glue:BatchCreatePartition
+                  - glue:BatchDeletePartition
+                  - glue:BatchGetPartition
+                  - glue:GetConnection
+                Effect: Allow
+                Resource:
+                  - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:*"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-GlueIngestPolicy 
+        #rds
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - rds-data:ExecuteStatement
+                  - rds-data:ExecuteSql
+                  - rds-data:BatchExecuteStatement
+                  - rds-data:BeginTransaction
+                Effect: Allow
+                Resource:
+                  - "*"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-RdsIngestPolicy 
+        #snsList
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - sns:DeleteEndpoint
+                  - sns:CreatePlatformApplication
+                  - sns:ListTopics
+                  - sns:CreatePlatformEndpoint
+                  - sns:Unsubscribe
+                  - sns:ListSubscriptions
+                  - sns:GetSubscriptionAttributes
+                Effect: Allow
+                Resource: 
+                  - "*"
+            Version: "2012-10-17"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-SnsListPolicy
+         #snsAction
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - sns:Publish
+                  - sns:GetTopicAttributes
+                  - sns:DeleteTopic
+                  - sns:CreateTopic
+                  - sns:SetTopicAttributes
+                  - sns:Subscribe
+                  - sns:ConfirmSubscription
+                Effect: Allow
+                Resource: 
+                  - !Sub "arn:aws:sns:*:${AWS::AccountId}:*"
+            Version: "2012-10-17"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-SnsActionPolicy
+
+  IamRoleModels:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+                - "states.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Effect: "Allow"
+                Resource:
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-logsLambdaPolicy
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Effect: "Allow"
+                Resource:
+                  - "arn:aws:s3:::input-thanos-reg-${env}/*"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-S3PolicyRead
+
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Effect: "Allow"
+                Resource:
+                  - "arn:aws:s3:::output-thanos-reg-${env}"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-S3PolicyWritte
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - glue:GetPartition
+                  - glue:GetPartitions
+                  - glue:CreatePartition
+                  - glue:GetTable
+                  - glue:CreateTable
+                  - glue:UpdateTable
+                  - glue:BatchCreatePartition
+                  - glue:BatchDeletePartition
+                  - glue:BatchGetPartition
+                Effect: "Allow"
+                Resource:
+                  - !Sub "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:*"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-GluePolicy 
+
+  IamRoleOrchest:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+                - "states.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - lambda:InvokeAsync
+                  - lambda:InvokeFunction
+                Effect: Allow
+                Resource:
+                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-InvokeLambdaStepFunctionPolicy
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - states:StartExecution
+                Effect: Allow
+                Resource:
+                  - !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:*"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-ExecutionStatesPolicy 
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - events:PutTargets
+                  - events:DescribeRule
+                  - events:PutRule
+                Effect: Allow
+                Resource:
+                  - !Sub "arn:aws:events:*:${AWS::AccountId}:*"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-EventsPolicy     
+
+Outputs:
+  IamRoleModelsOutput:
+    Value: !GetAtt IamRoleModels.Arn
+    Description: ARN IAM Role Models
+    Export:
+      Name: !Ref "outputArnIamRoleModels"
+  
+  IamRoleExtractorOutput:
+    Value: !GetAtt IamRoleExtractor.Arn
+    Description: ARN IAM Role Extractor
+    Export:
+      Name: !Ref "outputArnIamRoleExtractor"
+  
+  IamRoleOrchestOutput:
+    Value: !GetAtt IamRoleOrchest.Arn
+    Description: ARN IAM Role Orchest
+    Export:
+      Name: !Ref "outputArnIamRoleOrchest"
