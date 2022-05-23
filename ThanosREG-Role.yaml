@@ -7,20 +7,6 @@ Parameters:
     Type: "String"
     Description: Environment name. (dev/qa/prod)
     Default: "dev"
-  outputArnIamRoleModels:
-    Type: "String"
-    Description: Name Rol Models
-    Default: "ArnIamRoleModels"
-  
-  outputArnIamRoleExtractor:
-    Type: "String"
-    Description: Name Rol Extractor
-    Default: "ArnIamRoleExtractor"
-  
-  outputArnIamRoleOrchest:
-    Type: "String"
-    Description: Name Rol Orchest
-    Default: "ArnIamRoleOrchest"
 
 Resources:
   IamRoleExtractor:
@@ -122,10 +108,13 @@ Resources:
                   - s3:PutObject
                   - s3:DeleteObject
                   - s3:ListBucket
+                  - s3:CopyObject
                 Effect: Allow
                 Resource:
                   - !Sub "arn:aws:s3:::input-thanos-reg-${env}/*"
                   - !Sub "arn:aws:s3:::input-thanos-reg-${env}"
+                  - !Sub "arn:aws:s3:::backup-thanos-reg-${env}/*"
+                  - !Sub "arn:aws:s3:::backup-thanos-reg-${env}"
           PolicyName: !Sub KOAndina-${AWS::StackName}-S3IngestPolicy
         #secret manager
         - PolicyDocument:
@@ -317,21 +306,72 @@ Resources:
                   - !Sub "arn:aws:events:*:${AWS::AccountId}:*"
           PolicyName: !Sub KOAndina-${AWS::StackName}-EventsPolicy     
 
+  IamRoleApi:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        #S3
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Effect: "Allow"
+                Resource:
+                  - "arn:aws:s3:::output-thanos-reg-${env}"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-S3PolicyApiRead
+          #DynamoDB
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - dynamodb:BatchGetItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:GetItem
+                  - dynamodb:Scan
+                  - dynamodb:Query
+                  - dynamodb:PutItem
+                  - dynamodb:DescribeTable
+                  - dynamodb:UpdateItem
+                  - dynamodb:BatchWriteItem
+                Effect: Allow
+                Resource: 
+                  - "*"
+            Version: "2012-10-17"
+          PolicyName: !Sub KOAndina-${AWS::StackName}-DynamoDBApiPolicy
+
 Outputs:
   IamRoleModelsOutput:
     Value: !GetAtt IamRoleModels.Arn
     Description: ARN IAM Role Models
     Export:
-      Name: !Ref "outputArnIamRoleModels"
+      Name: "ArnIamRoleModels"
   
   IamRoleExtractorOutput:
     Value: !GetAtt IamRoleExtractor.Arn
     Description: ARN IAM Role Extractor
     Export:
-      Name: !Ref "outputArnIamRoleExtractor"
+      Name: "ArnIamRoleExtractor"
   
   IamRoleOrchestOutput:
     Value: !GetAtt IamRoleOrchest.Arn
     Description: ARN IAM Role Orchest
     Export:
-      Name: !Ref "outputArnIamRoleOrchest"
+      Name: "ArnIamRoleOrchest"
+
+  IamRoleApiOutput:
+    Value: !GetAtt IamRoleApi.Arn
+    Description: ARN IAM Role Api
+    Export:
+      Name: "ArnIamRoleApi"

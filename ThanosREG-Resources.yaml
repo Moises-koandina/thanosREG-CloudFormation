@@ -1,0 +1,780 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Resources thanos Regional
+
+Parameters:
+  env:
+    Type: "String"
+    Description: Environme  nt name. (dev/qa/prod)
+    Default: "dev"
+  networkStackName:
+    Type: "String"
+    Description: networkStackName
+    Default: "vpc-devregional-thanos"
+  userNameSap:
+    Type: "String"
+    Description: User Name to connect with SAP
+    Default: "thanoscom"
+  passSap:
+    Type: "String"
+    Description: Password to connect with SAP
+    Default: "4nd1n4.)!"
+  hostSap:
+    Type: "String"
+    Description: Host to connect with SAP
+    Default: "181.42.98.26"
+
+Resources:
+  LayerDataWrangler:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.7
+        - python3.8
+      Content:
+        S3Bucket: !Sub "layer-thanosreg-${env}"
+        S3Key: DataWrangler.zip
+      Description: Layer Data Wrangler
+      LayerName: DataWrangler
+
+  LayerPynwrfcLibs:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.7
+        - python3.8
+      Content:
+        S3Bucket: !Sub "layer-thanosreg-${env}"
+        S3Key: layer-pynwrfc-libs.zip
+      Description: Layer pynwrfc-libs
+      LayerName: layer-pynwrfc-libs
+
+  LayerSap:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.7
+        - python3.8
+      Content:
+        S3Bucket: !Sub "layer-thanosreg-${env}"
+        S3Key: layer-sap.zip
+      Description: Layer SAP
+      LayerName: layer-sap
+
+  SecretManagerSAP:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: extractor/credentials
+      Description: Credentials to access RFC SAP
+      SecretString: !Sub '{"user" : "${userNameSap}","pass": "${passSap}", "host": "${hostSap}"}'
+
+  DynamoDBTableIngest:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ingestThanosReg
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "run"
+          AttributeType: "S"
+        - AttributeName: "tablename"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "run"
+          KeyType: HASH
+        - AttributeName: "tablename"
+          KeyType: RANGE
+
+  DynamoDBTableErrorLog:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: errorThanosReg
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "datetime"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "datetime"
+          KeyType: HASH
+
+  DynamoDBTableRun:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: runThanosReg
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "run"
+          AttributeType: "S"
+        - AttributeName: "script"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "run"
+          KeyType: HASH
+        - AttributeName: "script"
+          KeyType: RANGE
+
+  DynamoDBTableLogChargeEtl:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: logEtlProcess
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "filename"
+          AttributeType: "S"
+        - AttributeName: "fecha"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "filename"
+          KeyType: HASH
+        - AttributeName: "fecha"
+          KeyType: RANGE
+
+  DynamoDBTableL001:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: L001
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "fecha"
+          AttributeType: "S"
+        - AttributeName: "componenete"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "fecha"
+          KeyType: HASH
+        - AttributeName: "componenete"
+          KeyType: RANGE
+
+  DynamoDBTableL002:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: L002
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "fecha"
+          AttributeType: "S"
+        - AttributeName: "componenete"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "fecha"
+          KeyType: HASH
+        - AttributeName: "componenete"
+          KeyType: RANGE
+
+  DynamoDBTableL003:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: L003
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "fecha"
+          AttributeType: "S"
+        - AttributeName: "componenete"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "fecha"
+          KeyType: HASH
+        - AttributeName: "componenete"
+          KeyType: RANGE
+
+  BucketOutput:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "output-thanos-reg-${env}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  BucketInput:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "input-thanos-reg-${env}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  BucketBackup:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "backup-thanos-reg-${env}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  BucketFrontAr:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "front-ar-thanos-reg-${env}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  BucketFrontPy:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "front-py-thanos-reg-${env}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  BucketFrontCl:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "front-cl-thanos-reg-${env}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  SecurityGroupThanosSAP:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG para lambda acceda a la VPC
+      GroupName: lambdaThanosSAPVpc-SG
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          CidrIp: 0.0.0.0/0
+      VpcId: !ImportValue 
+        "Fn::Sub": "${networkStackName}-VPCID"
+  
+  #Ingesta + Modelos
+  LambdaStatusTransportes:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Modelo L001 AR y PY
+      FunctionName: "status-transporte"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 2048
+      Role: !ImportValue ArnIamRoleModels
+      Layers:
+        [!Ref "LayerDataWrangler"]
+      Runtime: python3.8
+      Timeout: 180
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaStatusPosicionCarga:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Modelo L002 AR y PY
+      FunctionName: "status-posicion-carga"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 2048
+      Role: !ImportValue ArnIamRoleModels
+      Layers:
+        [!Ref "LayerDataWrangler"]
+      Runtime: python3.8
+      Timeout: 180
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaStatusCentro:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Modelo L003 AR y PY
+      FunctionName: "status-centro"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 2048
+      Role: !ImportValue ArnIamRoleModels
+      Layers:
+        [!Ref "LayerDataWrangler"]
+      Runtime: python3.8
+      Timeout: 180
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+  
+  LambdasapToAws:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Lambda Extractora from SAP
+      FunctionName: "sap-to-aws"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 2048
+      Role: !ImportValue ArnIamRoleExtractor
+      Layers:
+        [!Ref "LayerDataWrangler", !Ref "LayerPynwrfcLibs", !Ref "LayerSap"]
+      Runtime: python3.7
+      Timeout: 180
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref "SecurityGroupThanosSAP"
+        SubnetIds:
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet1AID"
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet2AID"
+
+  LambdaEtlOptimizer:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: ETL from optimizer to BD
+      FunctionName: "from-optimizador-etl"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 2048
+      Role: !ImportValue ArnIamRoleModels
+      Layers:
+        [!Ref "LayerDataWrangler"]
+      Runtime: python3.8
+      Timeout: 180
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaMakeCatalog:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Modelo L003 AR y PY
+      FunctionName: "create-all-tables"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 1024
+      Role: !ImportValue ArnIamRoleModels
+      Layers:
+        [!Ref "LayerDataWrangler"]
+      Runtime: python3.8
+      Timeout: 180
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaNotifySystem:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Modelo L003 AR y PY
+      FunctionName: "wake-up-notify-system"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 1024
+      Role: !ImportValue ArnIamRoleModels
+      Layers:
+        [!Ref "LayerDataWrangler"]
+      Runtime: python3.8
+      Timeout: 180
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  #APIs Argentinas
+  LambdaStatusTransportesApiA:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "ar-status-transporte-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaStatusCentroCApiA:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "ar-status-centro-c-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaStatusCentroTApiA:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "ar-status-centro-t-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaStatusPosicionCargaApiA:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "ar-status-posicion-carga-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaStatusPosicionCargaPApiA:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "ar-status-posicion-carga-p-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaMenuApiA:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "ar-menu-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaFiltrosApiA:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "ar-filtros-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 30
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaDateupdateApiA:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "ar-fecha-actualizacion-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 30
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  #APIs Paraguay
+  LambdaStatusTransportesApiP:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "py-status-transporte-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+          
+  LambdaStatusCentroCApiP:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "py-status-centro-c-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaStatusCentroTApiP:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "py-status-centro-t-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaStatusPosicionCargaApiP:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "py-status-posicion-carga-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaStatusPosicionCargaPApiP:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "py-status-posicion-carga-p-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaMenuApiP:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "py-menu-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 20
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaFiltrosApiP:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "py-filtros-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 30
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
+
+  LambdaDateupdateApiP:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+            return {
+                'statusCode': 200,
+                'body': json.dumps('success')
+            }
+      Description: Linked with API Gateway
+      FunctionName: "py-fecha-actualizacion-api"
+      Handler: lambda_function.lambda_handler
+      MemorySize: 256
+      Role: !ImportValue ArnIamRoleApi
+      Runtime: python3.8
+      Timeout: 30
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref "env"
