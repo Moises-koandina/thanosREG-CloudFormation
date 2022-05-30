@@ -131,49 +131,49 @@ Resources:
   DynamoDBTableL001:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: L001
+      TableName: ModelsL001
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: "fecha"
+        - AttributeName: "componente"
           AttributeType: "S"
-        - AttributeName: "componenete"
+        - AttributeName: "fecha"
           AttributeType: "S"
       KeySchema:
-        - AttributeName: "fecha"
+        - AttributeName: "componente"
           KeyType: HASH
-        - AttributeName: "componenete"
+        - AttributeName: "fecha"
           KeyType: RANGE
 
   DynamoDBTableL002:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: L002
+      TableName: ModelsL002
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: "fecha"
+        - AttributeName: "componente"
           AttributeType: "S"
-        - AttributeName: "componenete"
+        - AttributeName: "fecha"
           AttributeType: "S"
       KeySchema:
-        - AttributeName: "fecha"
+        - AttributeName: "componente"
           KeyType: HASH
-        - AttributeName: "componenete"
+        - AttributeName: "fecha"
           KeyType: RANGE
 
   DynamoDBTableL003:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: L003
+      TableName: ModelsL003
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: "fecha"
+        - AttributeName: "componente"
           AttributeType: "S"
-        - AttributeName: "componenete"
+        - AttributeName: "fecha"
           AttributeType: "S"
       KeySchema:
-        - AttributeName: "fecha"
+        - AttributeName: "componente"
           KeyType: HASH
-        - AttributeName: "componenete"
+        - AttributeName: "fecha"
           KeyType: RANGE
 
   BucketOutput:
