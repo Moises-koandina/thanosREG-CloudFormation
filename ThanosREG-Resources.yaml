@@ -842,7 +842,7 @@ Resources:
           #TrustedSigners:
           #  - String
           ViewerProtocolPolicy: "allow-all"
-        Comment: !Sub "Main Cloudfront Distribution - ar-thanos-reg-${env}"
+        Comment: !Sub "Cloudfront Distribution - ar-thanos-reg-${env}"
         #CustomErrorResponses:
         #  - CustomErrorResponse
         #DefaultCacheBehavior:
@@ -862,6 +862,72 @@ Resources:
             #ConnectionAttempts: Integer
             #ConnectionTimeout: Integer
             DomainName: !Sub "front-ar-thanos-reg-${env}.s3.${AWS::Region}.amazonaws.com"
+
+            #OriginCustomHeaders:
+            #  - OriginCustomHeader
+            #OriginPath: String
+            #OriginShield:
+            #  OriginShield
+
+          #  - CustomOriginConfig:
+          #      #HTTPPort: Integer
+          #      #HTTPSPort: Integer
+          #      #OriginKeepaliveTimeout: Integer
+          #      OriginProtocolPolicy: "match-viewer"
+          #      #OriginReadTimeout: Integer
+          #      OriginSSLProtocols:
+          #        - "SSLv3"
+
+  CloudFrontPy:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        #Aliases:
+        #  - String
+        #CacheBehaviors:
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - "GET"
+            - "HEAD"
+            - "OPTIONS"
+          #CachedMethods:
+          #  - String
+          CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
+          #Compress: Boolean
+          #FieldLevelEncryptionId: String
+          #FunctionAssociations:
+          #  - FunctionAssociation
+          #LambdaFunctionAssociations:
+          #  - LambdaFunctionAssociation
+          #OriginRequestPolicyId: String
+          #RealtimeLogConfigArn: String
+          #ResponseHeadersPolicyId: String
+          TargetOriginId: !Sub "front-py-thanos-reg-${env}"
+          #TrustedKeyGroups:
+          #  - String
+          #TrustedSigners:
+          #  - String
+          ViewerProtocolPolicy: "allow-all"
+        Comment: !Sub "Cloudfront Distribution - py-thanos-reg-${env}"
+        #CustomErrorResponses:
+        #  - CustomErrorResponse
+        #DefaultCacheBehavior:
+        #  DefaultCacheBehavior
+        DefaultRootObject: "index.html"
+        Enabled: "true"
+        #HttpVersion: String
+        IPV6Enabled: "false"
+        #Logging:
+        #  Logging
+        #OriginGroups:
+        #  OriginGroups
+        Origins:
+          - S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessIdPy}"
+            Id: !Sub "front-py-thanos-reg-${env}"
+            #ConnectionAttempts: Integer
+            #ConnectionTimeout: Integer
+            DomainName: !Sub "front-py-thanos-reg-${env}.s3.${AWS::Region}.amazonaws.com"
 
             #OriginCustomHeaders:
             #  - OriginCustomHeader
