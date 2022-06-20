@@ -772,6 +772,139 @@ Resources:
         Variables:
           ENVIRONMENT: !Ref "env"
 
+  # Log Groups
+  LogGroupRegFechaActualizacionApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${LambdaDateupdateApiA}"
+      RetentionInDays: 5
+
+  LogGroupRegFiltrosApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ar-filtros-api"
+      RetentionInDays: 5
+
+  LogGroupRegMenuApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ar-menu-api"
+      RetentionInDays: 5
+
+  LogGroupRegStatusCentroCApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ar-status-centro-c-api"
+      RetentionInDays: 5
+
+  LogGroupRegStatusCentroTApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ar-status-centro-t-api"
+      RetentionInDays: 5
+
+  LogGroupRegStatusPosicionCargaApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ar-status-posicion-carga-api"
+      RetentionInDays: 5
+
+  LogGroupRegStatusPosicionCargaPApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ar-status-posicion-carga-p-api"
+      RetentionInDays: 5
+
+  LogGroupRegStatusTransporteApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ar-status-transporte-api"
+      RetentionInDays: 5
+
+  LogGroupRegCreateAllTables:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/create-all-tables"
+      RetentionInDays: 5
+
+  LogGroupRegFromOptimizadorEtl:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/from-optimizador-etl"
+      RetentionInDays: 5
+
+  LogGroupRegPyFiltrosApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/py-filtros-api"
+      RetentionInDays: 5
+
+  LogGroupRegPyMenuApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/py-menu-api"
+      RetentionInDays: 5
+
+  LogGroupRegPyStatusCentroCApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/py-status-centro-c-api"
+      RetentionInDays: 5
+
+  LogGroupRegPyStatusCentroTApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/py-status-centro-t-api"
+      RetentionInDays: 5
+
+  LogGroupRegPyStatusPosicionCargaApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/py-status-posicion-carga-api"
+      RetentionInDays: 5
+
+  LogGroupRegPyStatusPosicionCargaPApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/py-status-posicion-carga-p-api"
+      RetentionInDays: 5
+
+  LogGroupRegPyStatusTransporteApi:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/py-status-transporte-api"
+      RetentionInDays: 5
+
+  LogGroupRegSapToAws:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/sap-to-aws"
+      RetentionInDays: 5
+
+  LogGroupRegStatusCentro:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/status-centro"
+      RetentionInDays: 5
+
+  LogGroupRegStatusPosicionCarga:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/status-posicion-carga"
+      RetentionInDays: 5
+
+  LogGroupRegStatusTransporte:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/status-transporte"
+      RetentionInDays: 5
+
+  LogGroupRegWakeUpNotifySystem:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/wake-up-notify-system"
+      RetentionInDays: 5
+
   OriginAccessIdAr:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
