@@ -19,10 +19,18 @@ Parameters:
     Type: "String"
     Description: Password to connect with SAP
     Default: "4nd1n4.)!"
-  hostSap:
+  ipSapPbr:
     Type: "String"
     Description: Host to connect with SAP
     Default: "181.42.98.26"
+  ipSapQbr:
+    Type: "String"
+    Description: Host to connect with SAP
+    Default: "181.42.96.191"
+  ipSapXbr:
+    Type: "String"
+    Description: Host to connect with SAP
+    Default: "181.42.96.148"
 
 Resources:
   LayerDataWrangler:
@@ -92,7 +100,7 @@ Resources:
     Properties:
       Name: extractor/credentials
       Description: Credentials to access RFC SAP
-      SecretString: !Sub '{"user" : "${userNameSap}","pass": "${passSap}", "host": "${hostSap}"}'
+      SecretString: !Sub '{"user" : "${userNameSap}","pass": "${passSap}", "hostPbr": "${ipSapPbr}", "hostQbr": "${ipSapQbr}", "hostXbr": "${ipSapXbr}"}'
 
   DynamoDBTableIngest:
     Type: AWS::DynamoDB::Table
@@ -201,6 +209,7 @@ Resources:
           KeyType: HASH
         - AttributeName: "componente"
           KeyType: RANGE
+
   BucketOutput:
     Type: AWS::S3::Bucket
     Properties:
@@ -296,6 +305,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaStatusPosicionCarga:
     Type: AWS::Lambda::Function
@@ -319,6 +331,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaStatusCentro:
     Type: AWS::Lambda::Function
@@ -342,6 +357,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdasapToAws:
     Type: AWS::Lambda::Function
@@ -366,6 +384,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
       VpcConfig:
         SecurityGroupIds:
           - !Ref "SecurityGroupThanosSAP"
@@ -397,6 +418,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaMakeCatalog:
     Type: AWS::Lambda::Function
@@ -420,6 +444,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaNotifySystem:
     Type: AWS::Lambda::Function
@@ -443,6 +470,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   #APIs Argentinas
   LambdaStatusTransportesApiA:
@@ -466,6 +496,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaStatusCentroCApiA:
     Type: AWS::Lambda::Function
@@ -488,6 +521,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaStatusCentroTApiA:
     Type: AWS::Lambda::Function
@@ -510,6 +546,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaStatusPosicionCargaApiA:
     Type: AWS::Lambda::Function
@@ -532,6 +571,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaStatusPosicionCargaPApiA:
     Type: AWS::Lambda::Function
@@ -554,6 +596,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaMenuApiA:
     Type: AWS::Lambda::Function
@@ -576,6 +621,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaFiltrosApiA:
     Type: AWS::Lambda::Function
@@ -598,6 +646,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaDateupdateApiA:
     Type: AWS::Lambda::Function
@@ -620,6 +671,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   #APIs Paraguay
   LambdaStatusTransportesApiP:
@@ -643,6 +697,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaStatusCentroCApiP:
     Type: AWS::Lambda::Function
@@ -665,6 +722,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaStatusCentroTApiP:
     Type: AWS::Lambda::Function
@@ -687,6 +747,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaStatusPosicionCargaApiP:
     Type: AWS::Lambda::Function
@@ -709,6 +772,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaStatusPosicionCargaPApiP:
     Type: AWS::Lambda::Function
@@ -731,6 +797,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaMenuApiP:
     Type: AWS::Lambda::Function
@@ -753,6 +822,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaFiltrosApiP:
     Type: AWS::Lambda::Function
@@ -775,6 +847,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   LambdaDateupdateApiP:
     Type: AWS::Lambda::Function
@@ -797,6 +872,9 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref "env"
+          PROYECTO: "Thanos-Regional"
+          ID_ACCOUNT: !Sub ${AWS::AccountId}
+          REGION: !Sub ${AWS::Region}
 
   # Log Groups
   LogGroupRegFechaActualizacionApi:
@@ -852,12 +930,6 @@ Resources:
     Properties:
       LogGroupName: !Sub "/aws/lambda/${LambdaMakeCatalog}"
       RetentionInDays: 5
-
-  #LogGroupRegFromOptimizadorEtl:
-  #  Type: "AWS::Logs::LogGroup"
-  #  Properties:
-  #    LogGroupName: !Sub "/aws/lambda/from-optimizador-etl"
-  #    RetentionInDays: 5
 
   LogGroupRegPyFiltrosApi:
     Type: "AWS::Logs::LogGroup"
@@ -932,29 +1004,29 @@ Resources:
       RetentionInDays: 5
 
   #Cognito Pool
-  cognitoUserPool:
-    Type: AWS::Cognito::UserPool
-    Properties:
-      UserPoolName: !Sub "SSOAzureAD-${env}"
-      UsernameConfiguration:
-        CaseSensitive: false
-      AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: true
-      Policies:
-        PasswordPolicy:
-          MinimumLength: 8
-          RequireLowercase: true
-          RequireSymbols: true
-          RequireUppercase: true
-          TemporaryPasswordValidityDays: 7
-      UsernameAttributes:
-        - email
-      MfaConfiguration: "OFF"
-      Schema:
-        - AttributeDataType: String
-          DeveloperOnlyAttribute: false
-          Mutable: true
-          Name: email
+  # cognitoUserPool:
+  #   Type: AWS::Cognito::UserPool
+  #   Properties:
+  #     UserPoolName: !Sub "SSOAzureAD-${env}"
+  #     UsernameConfiguration:
+  #       CaseSensitive: false
+  #     AdminCreateUserConfig:
+  #       AllowAdminCreateUserOnly: true
+  #     Policies:
+  #       PasswordPolicy:
+  #         MinimumLength: 8
+  #         RequireLowercase: true
+  #         RequireSymbols: true
+  #         RequireUppercase: true
+  #         TemporaryPasswordValidityDays: 7
+  #     UsernameAttributes:
+  #       - email
+  #     MfaConfiguration: "OFF"
+  #     Schema:
+  #       - AttributeDataType: String
+  #         DeveloperOnlyAttribute: false
+  #         Mutable: true
+  #         Name: email
 
   #Creacion API y metodos
   #Partes de la api RestApi/Resource/Method + Autorizador
