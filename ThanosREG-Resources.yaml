@@ -299,7 +299,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 2048
       Role: !ImportValue ArnIamRoleModels
-      Layers: [!Ref "LayerDataWrangler"]
+      Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.8
       Timeout: 180
       Environment:
@@ -325,7 +325,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 2048
       Role: !ImportValue ArnIamRoleModels
-      Layers: [!Ref "LayerDataWrangler"]
+      Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.8
       Timeout: 180
       Environment:
@@ -351,7 +351,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 2048
       Role: !ImportValue ArnIamRoleModels
-      Layers: [!Ref "LayerDataWrangler"]
+      Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.8
       Timeout: 180
       Environment:
@@ -438,7 +438,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 1024
       Role: !ImportValue ArnIamRoleModels
-      Layers: [!Ref "LayerDataWrangler"]
+      Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.8
       Timeout: 180
       Environment:
@@ -464,7 +464,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 1024
       Role: !ImportValue ArnIamRoleModels
-      Layers: [!Ref "LayerDataWrangler"]
+      Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.8
       Timeout: 180
       Environment:
@@ -1003,30 +1003,89 @@ Resources:
       LogGroupName: !Sub "/aws/lambda/${LambdaNotifySystem}"
       RetentionInDays: 5
 
-  #Cognito Pool
-  # cognitoUserPool:
-  #   Type: AWS::Cognito::UserPool
-  #   Properties:
-  #     UserPoolName: !Sub "SSOAzureAD-${env}"
-  #     UsernameConfiguration:
-  #       CaseSensitive: false
-  #     AdminCreateUserConfig:
-  #       AllowAdminCreateUserOnly: true
-  #     Policies:
-  #       PasswordPolicy:
-  #         MinimumLength: 8
-  #         RequireLowercase: true
-  #         RequireSymbols: true
-  #         RequireUppercase: true
-  #         TemporaryPasswordValidityDays: 7
-  #     UsernameAttributes:
-  #       - email
-  #     MfaConfiguration: "OFF"
-  #     Schema:
-  #       - AttributeDataType: String
-  #         DeveloperOnlyAttribute: false
-  #         Mutable: true
-  #         Name: email
+  OriginAccessIdAr:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub "ar-${env} s3's OAI"
+
+  OriginAccessIdPy:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub "py-${env} s3's OAI"
+
+  BucketPolicyAR:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Sub "front-ar-thanos-reg-${env}/*"
+      PolicyDocument:
+        Id: !Sub "PolicyForCloudFrontPrivateContent-front-ar-thanos-reg-${env}"
+        Statement:
+          - Sid: "1"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${OriginAccessIdAr}"
+            Action: s3:GetObject
+            Resource: !Sub "arn:aws:s3:::front-ar-thanos-reg-${env}/*"
+
+  BucketPolicyPY:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Sub "front-py-thanos-reg-${env}/*"
+      PolicyDocument:
+        Id: !Sub "PolicyForCloudFrontPrivateContent-front-py-thanos-reg-${env}"
+        Statement:
+          - Sid: "1"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${OriginAccessIdPy}"
+            Action: s3:GetObject
+            Resource: !Sub "arn:aws:s3:::front-py-thanos-reg-${env}/*"
+
+  CloudFrontAr:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - "GET"
+            - "HEAD"
+            - "OPTIONS"
+          CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
+          TargetOriginId: !Sub "front-ar-thanos-reg-${env}"
+          ViewerProtocolPolicy: "allow-all"
+        Comment: !Sub "Cloudfront Distribution - ar-thanos-reg-${env}"
+        DefaultRootObject: "index.html"
+        Enabled: "true"
+        IPV6Enabled: "false"
+        Origins:
+          - S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessIdAr}"
+            Id: !Sub "front-ar-thanos-reg-${env}"
+            DomainName: !Sub "front-ar-thanos-reg-${env}.s3.${AWS::Region}.amazonaws.com"
+
+  CloudFrontPy:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - "GET"
+            - "HEAD"
+            - "OPTIONS"
+          CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
+          TargetOriginId: !Sub "front-py-thanos-reg-${env}"
+          ViewerProtocolPolicy: "allow-all"
+        Comment: !Sub "Cloudfront Distribution - py-thanos-reg-${env}"
+        DefaultRootObject: "index.html"
+        Enabled: "true"
+        IPV6Enabled: "false"
+        Origins:
+          - S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessIdPy}"
+            Id: !Sub "front-py-thanos-reg-${env}"
+            DomainName: !Sub "front-py-thanos-reg-${env}.s3.${AWS::Region}.amazonaws.com"
 
   #Creacion API y metodos
   #Partes de la api RestApi/Resource/Method + Autorizador
@@ -2132,176 +2191,3 @@ Resources:
             method.response.header.Access-Control-Allow-Origin: true
       RestApiId: !Ref ApiGatewayReg
       ResourceId: !Ref ResourcePyStatusTransporte
-
-  ##
-  OriginAccessIdAr:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Sub "ar-${env} s3's OAI"
-
-  OriginAccessIdPy:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Sub "py-${env} s3's OAI"
-
-  BucketPolicyAR:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Sub "front-ar-thanos-reg-${env}/*"
-      PolicyDocument:
-        Id: !Sub "PolicyForCloudFrontPrivateContent-front-ar-thanos-reg-${env}"
-        Statement:
-          - Sid: "1"
-            Effect: Allow
-            Principal:
-              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${OriginAccessIdAr}"
-            Action: s3:GetObject
-            Resource: !Sub "arn:aws:s3:::front-ar-thanos-reg-${env}/*"
-
-  BucketPolicyPY:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Sub "front-py-thanos-reg-${env}/*"
-      PolicyDocument:
-        Id: !Sub "PolicyForCloudFrontPrivateContent-front-py-thanos-reg-${env}"
-        Statement:
-          - Sid: "1"
-            Effect: Allow
-            Principal:
-              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${OriginAccessIdPy}"
-            Action: s3:GetObject
-            Resource: !Sub "arn:aws:s3:::front-py-thanos-reg-${env}/*"
-
-  CloudFrontAr:
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        #Aliases:
-        #  - String
-        #CacheBehaviors:
-        DefaultCacheBehavior:
-          AllowedMethods:
-            - "GET"
-            - "HEAD"
-            - "OPTIONS"
-          #CachedMethods:
-          #  - String
-          CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
-          #Compress: Boolean
-          #FieldLevelEncryptionId: String
-          #FunctionAssociations:
-          #  - FunctionAssociation
-          #LambdaFunctionAssociations:
-          #  - LambdaFunctionAssociation
-          #OriginRequestPolicyId: String
-          #RealtimeLogConfigArn: String
-          #ResponseHeadersPolicyId: String
-          TargetOriginId: !Sub "front-ar-thanos-reg-${env}"
-          #TrustedKeyGroups:
-          #  - String
-          #TrustedSigners:
-          #  - String
-          ViewerProtocolPolicy: "allow-all"
-        Comment: !Sub "Cloudfront Distribution - ar-thanos-reg-${env}"
-        #CustomErrorResponses:
-        #  - CustomErrorResponse
-        #DefaultCacheBehavior:
-        #  DefaultCacheBehavior
-        DefaultRootObject: "index.html"
-        Enabled: "true"
-        #HttpVersion: String
-        IPV6Enabled: "false"
-        #Logging:
-        #  Logging
-        #OriginGroups:
-        #  OriginGroups
-        Origins:
-          - S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessIdAr}"
-            Id: !Sub "front-ar-thanos-reg-${env}"
-            #ConnectionAttempts: Integer
-            #ConnectionTimeout: Integer
-            DomainName: !Sub "front-ar-thanos-reg-${env}.s3.${AWS::Region}.amazonaws.com"
-
-            #OriginCustomHeaders:
-            #  - OriginCustomHeader
-            #OriginPath: String
-            #OriginShield:
-            #  OriginShield
-
-          #  - CustomOriginConfig:
-          #      #HTTPPort: Integer
-          #      #HTTPSPort: Integer
-          #      #OriginKeepaliveTimeout: Integer
-          #      OriginProtocolPolicy: "match-viewer"
-          #      #OriginReadTimeout: Integer
-          #      OriginSSLProtocols:
-          #        - "SSLv3"
-
-  CloudFrontPy:
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        #Aliases:
-        #  - String
-        #CacheBehaviors:
-        DefaultCacheBehavior:
-          AllowedMethods:
-            - "GET"
-            - "HEAD"
-            - "OPTIONS"
-          #CachedMethods:
-          #  - String
-          CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
-          #Compress: Boolean
-          #FieldLevelEncryptionId: String
-          #FunctionAssociations:
-          #  - FunctionAssociation
-          #LambdaFunctionAssociations:
-          #  - LambdaFunctionAssociation
-          #OriginRequestPolicyId: String
-          #RealtimeLogConfigArn: String
-          #ResponseHeadersPolicyId: String
-          TargetOriginId: !Sub "front-py-thanos-reg-${env}"
-          #TrustedKeyGroups:
-          #  - String
-          #TrustedSigners:
-          #  - String
-          ViewerProtocolPolicy: "allow-all"
-        Comment: !Sub "Cloudfront Distribution - py-thanos-reg-${env}"
-        #CustomErrorResponses:
-        #  - CustomErrorResponse
-        #DefaultCacheBehavior:
-        #  DefaultCacheBehavior
-        DefaultRootObject: "index.html"
-        Enabled: "true"
-        #HttpVersion: String
-        IPV6Enabled: "false"
-        #Logging:
-        #  Logging
-        #OriginGroups:
-        #  OriginGroups
-        Origins:
-          - S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessIdPy}"
-            Id: !Sub "front-py-thanos-reg-${env}"
-            #ConnectionAttempts: Integer
-            #ConnectionTimeout: Integer
-            DomainName: !Sub "front-py-thanos-reg-${env}.s3.${AWS::Region}.amazonaws.com"
-
-            #OriginCustomHeaders:
-            #  - OriginCustomHeader
-            #OriginPath: String
-            #OriginShield:
-            #  OriginShield
-
-          #  - CustomOriginConfig:
-          #      #HTTPPort: Integer
-          #      #HTTPSPort: Integer
-          #      #OriginKeepaliveTimeout: Integer
-          #      OriginProtocolPolicy: "match-viewer"
-          #      #OriginReadTimeout: Integer
-          #      OriginSSLProtocols:
-          #        - "SSLv3"
