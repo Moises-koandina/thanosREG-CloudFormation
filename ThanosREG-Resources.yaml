@@ -301,6 +301,14 @@ Resources:
           PROYECTO: "Thanos-Regional"
           ID_ACCOUNT: !Sub ${AWS::AccountId}
           REGION: !Sub ${AWS::Region}
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref "SecurityGroupThanosSAP"
+        SubnetIds:
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet1AID"
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet2AID"
 
   LambdaStatusPosicionCarga:
     Type: AWS::Lambda::Function
@@ -327,6 +335,14 @@ Resources:
           PROYECTO: "Thanos-Regional"
           ID_ACCOUNT: !Sub ${AWS::AccountId}
           REGION: !Sub ${AWS::Region}
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref "SecurityGroupThanosSAP"
+        SubnetIds:
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet1AID"
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet2AID"
 
   LambdaStatusCentro:
     Type: AWS::Lambda::Function
@@ -353,6 +369,14 @@ Resources:
           PROYECTO: "Thanos-Regional"
           ID_ACCOUNT: !Sub ${AWS::AccountId}
           REGION: !Sub ${AWS::Region}
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref "SecurityGroupThanosSAP"
+        SubnetIds:
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet1AID"
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet2AID"
 
   LambdasapToAws:
     Type: AWS::Lambda::Function
@@ -414,6 +438,14 @@ Resources:
           PROYECTO: "Thanos-Regional"
           ID_ACCOUNT: !Sub ${AWS::AccountId}
           REGION: !Sub ${AWS::Region}
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref "SecurityGroupThanosSAP"
+        SubnetIds:
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet1AID"
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet2AID"
 
   LambdaMakeCatalog:
     Type: AWS::Lambda::Function
@@ -440,6 +472,14 @@ Resources:
           PROYECTO: "Thanos-Regional"
           ID_ACCOUNT: !Sub ${AWS::AccountId}
           REGION: !Sub ${AWS::Region}
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref "SecurityGroupThanosSAP"
+        SubnetIds:
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet1AID"
+          - !ImportValue
+            "Fn::Sub": "${networkStackName}-PrivateSubnet2AID"
 
   LambdaNotifySystem:
     Type: AWS::Lambda::Function
@@ -1057,6 +1097,7 @@ Resources:
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessIdAr}"
             Id: !Sub "front-ar-thanos-reg-${env}"
             DomainName: !Sub "front-ar-thanos-reg-${env}.s3.${AWS::Region}.amazonaws.com"
+        WebACLId: !GetAtt wafARCDF.Arn
 
   CloudFrontPy:
     Type: AWS::CloudFront::Distribution
@@ -1079,8 +1120,95 @@ Resources:
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessIdPy}"
             Id: !Sub "front-py-thanos-reg-${env}"
             DomainName: !Sub "front-py-thanos-reg-${env}.s3.${AWS::Region}.amazonaws.com"
+        WebACLId: !GetAtt wafPYCDF.Arn
 
-  #Recursos de Metodos
+  IpSetAR:
+    Type: AWS::WAFv2::IPSet
+    Properties:
+      Description: "IPs publicas Andina"
+      Name: !Sub "IPs-${AWS::StackName}-AR-${env}"
+      Scope: CLOUDFRONT
+      IPAddressVersion: IPV4
+      Addresses:
+        - "190.215.193.68/32"
+        - "190.215.193.69/32"
+        - "190.215.193.70/32"
+        - "200.70.33.66/32"
+        - "190.221.175.4/32"
+        - "181.13.90.170/32"
+
+  wafARCDF:
+    Type: AWS::WAFv2::WebACL
+    DependsOn:
+      - IpSetAR
+    Properties:
+      Name: !Sub "WAF-${AWS::StackName}-AR-${env}"
+      Scope: CLOUDFRONT
+      DefaultAction:
+        Block: {}
+      Description: "Permitir acceso IP publica Andina"
+      Rules:
+        - Name: "RedAndina"
+          Priority: 0
+          Statement:
+            IPSetReferenceStatement:
+              ARN: !GetAtt IpSetAR.Arn
+          Action:
+            Allow: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: "IpLimitationRule"
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: "WebACLMetric"
+      Capacity: 1
+
+  IpSetPY:
+    Type: AWS::WAFv2::IPSet
+    Properties:
+      Description: "IPs publicas Andina"
+      Name: !Sub "IPs-${AWS::StackName}-PY-${env}"
+      Scope: CLOUDFRONT
+      IPAddressVersion: IPV4
+      Addresses:
+        - "190.215.193.68/32"
+        - "190.215.193.69/32"
+        - "190.215.193.70/32"
+        - "200.70.33.66/32"
+        - "190.221.175.4/32"
+        - "181.13.90.170/32"
+
+  wafPYCDF:
+    Type: AWS::WAFv2::WebACL
+    DependsOn:
+      - IpSetPY
+    Properties:
+      Name: !Sub "WAF-${AWS::StackName}-PY-${env}"
+      Scope: CLOUDFRONT
+      DefaultAction:
+        Block: {}
+      Description: "Permitir acceso IP publica Andina"
+      Rules:
+        - Name: "RedAndina"
+          Priority: 0
+          Statement:
+            IPSetReferenceStatement:
+              ARN: !GetAtt IpSetPY.Arn
+          Action:
+            Allow: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: "IpLimitationRule"
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: "WebACLMetric"
+      Capacity: 1
+
+  #API
   ResourceAr:
     Type: AWS::ApiGateway::Resource
     Properties:
