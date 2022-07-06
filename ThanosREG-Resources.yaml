@@ -37,11 +37,10 @@ Resources:
     Type: AWS::Lambda::LayerVersion
     Properties:
       CompatibleRuntimes:
-        - python3.7
-        - python3.8
+        - python3.9
       Content:
         S3Bucket: !Sub "layer-thanosreg-${env}"
-        S3Key: DataWrangler.zip
+        S3Key: AWSDataW39OriginalAWS.zip
       Description: Layer Data Wrangler
       LayerName: DataWrangler
 
@@ -49,8 +48,7 @@ Resources:
     Type: AWS::Lambda::LayerVersion
     Properties:
       CompatibleRuntimes:
-        - python3.7
-        - python3.8
+        - python3.9
       Content:
         S3Bucket: !Sub "layer-thanosreg-${env}"
         S3Key: layer-pynwrfc-libs.zip
@@ -61,8 +59,7 @@ Resources:
     Type: AWS::Lambda::LayerVersion
     Properties:
       CompatibleRuntimes:
-        - python3.7
-        - python3.8
+        - python3.9
       Content:
         S3Bucket: !Sub "layer-thanosreg-${env}"
         S3Key: layer-sap.zip
@@ -73,8 +70,6 @@ Resources:
     Type: AWS::Lambda::LayerVersion
     Properties:
       CompatibleRuntimes:
-        - python3.7
-        - python3.8
         - python3.9
       Content:
         S3Bucket: !Sub "layer-thanosreg-${env}"
@@ -86,8 +81,6 @@ Resources:
     Type: AWS::Lambda::LayerVersion
     Properties:
       CompatibleRuntimes:
-        - python3.7
-        - python3.8
         - python3.9
       Content:
         S3Bucket: !Sub "layer-thanosreg-${env}"
@@ -300,7 +293,7 @@ Resources:
       MemorySize: 2048
       Role: !ImportValue ArnIamRoleModels
       Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 180
       Environment:
         Variables:
@@ -326,7 +319,7 @@ Resources:
       MemorySize: 2048
       Role: !ImportValue ArnIamRoleModels
       Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 180
       Environment:
         Variables:
@@ -352,7 +345,7 @@ Resources:
       MemorySize: 2048
       Role: !ImportValue ArnIamRoleModels
       Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 180
       Environment:
         Variables:
@@ -379,7 +372,7 @@ Resources:
       Role: !ImportValue ArnIamRoleExtractor
       Layers:
         [!Ref "LayerDataWrangler", !Ref "LayerPynwrfcLibs", !Ref "LayerSap"]
-      Runtime: python3.7
+      Runtime: python3.9
       Timeout: 180
       Environment:
         Variables:
@@ -413,7 +406,7 @@ Resources:
       MemorySize: 1024
       Role: !ImportValue ArnIamRoleModels
       Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 50
       Environment:
         Variables:
@@ -439,7 +432,7 @@ Resources:
       MemorySize: 1024
       Role: !ImportValue ArnIamRoleModels
       Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 180
       Environment:
         Variables:
@@ -465,7 +458,7 @@ Resources:
       MemorySize: 1024
       Role: !ImportValue ArnIamRoleModels
       Layers: [!Ref "LayerDataWrangler", !Ref "LayerYml", !Ref "LayerSns"]
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 180
       Environment:
         Variables:
@@ -491,7 +484,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -516,7 +509,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -541,7 +534,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -566,7 +559,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -591,7 +584,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -616,7 +609,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -641,7 +634,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 30
       Environment:
         Variables:
@@ -666,7 +659,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 30
       Environment:
         Variables:
@@ -692,7 +685,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -717,7 +710,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -742,7 +735,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -767,7 +760,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -792,7 +785,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -817,7 +810,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 20
       Environment:
         Variables:
@@ -842,7 +835,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 30
       Environment:
         Variables:
@@ -867,7 +860,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
-      Runtime: python3.8
+      Runtime: python3.9
       Timeout: 30
       Environment:
         Variables:
@@ -1087,10 +1080,6 @@ Resources:
             Id: !Sub "front-py-thanos-reg-${env}"
             DomainName: !Sub "front-py-thanos-reg-${env}.s3.${AWS::Region}.amazonaws.com"
 
-  #Creacion API y metodos
-  #Partes de la api RestApi/Resource/Method + Autorizador
-  #Autorizador API
-
   #Recursos de Metodos
   ResourceAr:
     Type: AWS::ApiGateway::Resource
@@ -1243,18 +1232,20 @@ Resources:
       OperationName: fecha-actualizacion-option
       ApiKeyRequired: false
       AuthorizationType: NONE
-      #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: OPTIONS
       Integration:
         #PassthroughBehavior: NEVER
-        IntegrationHttpMethod: OPTIONS
+        ##IntegrationHttpMethod: OPTIONS
         Type: MOCK
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !GetAtt LambdaDateupdateApiA.Arn
         IntegrationResponses:
           - StatusCode: 200
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1275,7 +1266,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1291,8 +1282,8 @@ Resources:
           ResponseModels:
             application/json: Empty
           ResponseParameters:
-            method.response.header.Access-Control-Allow-Headers: true
-            method.response.header.Access-Control-Allow-Methods: true
+            #method.response.header.Access-Control-Allow-Headers: true
+            #method.response.header.Access-Control-Allow-Methods: true
             method.response.header.Access-Control-Allow-Origin: true
       RestApiId: !Ref ApiGatewayReg
       ResourceId: !Ref ResourceArFechaActualizacion
@@ -1313,7 +1304,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1334,7 +1325,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1371,7 +1362,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1392,7 +1383,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1431,7 +1422,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1452,7 +1443,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1491,7 +1482,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1512,7 +1503,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1551,7 +1542,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1572,7 +1563,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1611,7 +1602,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1632,7 +1623,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1671,7 +1662,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1692,7 +1683,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1732,7 +1723,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1753,7 +1744,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1791,7 +1782,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1812,7 +1803,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1849,7 +1840,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1870,7 +1861,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1909,7 +1900,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1930,7 +1921,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -1969,7 +1960,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -1990,7 +1981,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -2029,7 +2020,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -2050,7 +2041,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -2089,7 +2080,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -2110,7 +2101,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -2149,7 +2140,7 @@ Resources:
             ResponseTemplates:
               application/json: Empty
         RequestTemplates:
-          application/json: ""
+          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseModels:
@@ -2170,7 +2161,7 @@ Resources:
       #AuthorizerId: !Ref apiGatewayAuthorizer
       HttpMethod: GET
       Integration:
-        IntegrationHttpMethod: GET
+        IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -2191,3 +2182,173 @@ Resources:
             method.response.header.Access-Control-Allow-Origin: true
       RestApiId: !Ref ApiGatewayReg
       ResourceId: !Ref ResourcePyStatusTransporte
+
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      ##- ApiGatewayArFechaActualizacionOptions3
+      - ApiGatewayArFechaActualizacionGet
+      - ApiGatewayArFiltrosOptions
+      - ApiGatewayArFiltrosGet
+      - ApiGatewayArMenuOptions
+      - ApiGatewayArMenuGet
+      - ApiGatewayArPosicionDeCargaPalletOptions
+      - ApiGatewayArPosicionDeCargaPalletGet
+      - ApiGatewayArPosicionDeCargaTablaOptions
+      - ApiGatewayArPosicionDeCargaTablaGet
+      - ApiGatewayArStatusCentroGraficosOptions
+      - ApiGatewayArStatusCentroGraficosGet
+      - ApiGatewayArStatusCentroTablasOptions
+      - ApiGatewayArStatusCentroTablasGet
+      - ApiGatewayArStatusTransporteOptions
+      - ApiGatewayArStatusTransporteGet
+      - ApiGatewayPyFechaActualizacionOptions
+      - ApiGatewayPyFechaActualizacionGet
+      - ApiGatewayPyFiltrosOptions
+      - ApiGatewayPyFiltrosGet
+      - ApiGatewayPyMenuOptions
+      - ApiGatewayPyMenuGet
+      - ApiGatewayPyPosicionDeCargaPalletOptions
+      - ApiGatewayPyPosicionDeCargaPalletGet
+      - ApiGatewayPyPosicionDeCargaTablaOptions
+      - ApiGatewayPyPosicionDeCargaTablaGet
+      - ApiGatewayPyStatusCentroGraficosOptions
+      - ApiGatewayPyStatusCentroGraficosGet
+      - ApiGatewayPyStatusCentroTablasOptions
+      - ApiGatewayPyStatusCentroTablasGet
+      - ApiGatewayPyStatusTransporteOptions
+      - ApiGatewayPyStatusTransporteGet
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ##StageName: !Ref apiGatewayStageName
+
+  ##ApiGatewayPermission
+  ##Ar
+  ApiGatewayInvokePermissionArFechaActualizacionGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaDateupdateApiA.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/fecha-actualizacion
+
+  ApiGatewayInvokePermissionArFiltrosGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaFiltrosApiA.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/filtros
+
+  ApiGatewayInvokePermissionArMenuGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaMenuApiA.Arn ##!Ref LambdaMenuApiA
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/menu
+
+  ApiGatewayInvokePermissionArPosicionDeCargaPalletGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaStatusPosicionCargaPApiA.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/posicion-de-carga/pallet
+
+  ApiGatewayInvokePermissionArPosicionDeCargaTablaGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaStatusPosicionCargaApiA.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/posicion-de-carga/tabla
+
+  ApiGatewayInvokePermissionArStatusCentroGraficosGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaStatusCentroCApiA.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/status-centro/graficos
+
+  ApiGatewayInvokePermissionArStatusCentroTablasGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaStatusCentroTApiA.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/status-centro/tablas
+
+  ApiGatewayInvokePermissionArStatusTransporteGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaStatusTransportesApiA.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/status-transporte
+
+  ##Py
+  ApiGatewayInvokePermissionPyFechaActualizacionGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaDateupdateApiP.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/fecha-actualizacion
+
+  ApiGatewayInvokePermissionPyFiltrosGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaFiltrosApiP.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/filtros
+
+  ApiGatewayInvokePermissionPyMenuGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaMenuApiP.Arn ##!Ref LambdaMenuApiA
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/menu
+
+  ApiGatewayInvokePermissionPyPosicionDeCargaPalletGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaStatusPosicionCargaPApiP.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/posicion-de-carga/pallet
+
+  ApiGatewayInvokePermissionPyPosicionDeCargaTablaGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaStatusPosicionCargaApiP.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/posicion-de-carga/tabla
+
+  ApiGatewayInvokePermissionPyStatusCentroGraficosGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaStatusCentroCApiP.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/status-centro/graficos
+
+  ApiGatewayInvokePermissionPyStatusCentroTablasGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaStatusCentroTApiP.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/status-centro/tablas
+
+  ApiGatewayInvokePermissionPyStatusTransporteGet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaStatusTransportesApiP.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/status-transporte
