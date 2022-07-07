@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: "MySQL RDS"
+
+Parameters:
+  env:
+    Type: "String"
+    Description: Environment name. (dev/qa/prod)
+    Default: "dev"
+  DBPassword:
+    NoEcho: 'true'
+    Description: Password MySQL database access
+    Type: String
+    MinLength: '8'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]*'
+    ConstraintDescription: must contain only alphanumeric characters.
+
+Resources:
+#  TopicPolicy:
+#    Type: AWS::SNS::TopicPolicy
+#    Properties: 
+#      PolicyDocument: 
+#        Id: __dataIngestPipelineErrorTopic_basic_policy_ID
+#        Version: '2012-10-17'
+#        Statement:
+#        - Sid: __dataIngestPipelineErrorTopic_basic_policy_ID
+#          Effect: Allow
+#          Principal:
+#            Service: sts.amazonaws.com
+#          Action: 
+#            - sns:GetTopicAttributes
+#            - sns:Subscribe
+#            - sns:ListSubscriptionsByTopic
+#            - sns:Publish
+#          Condition: 
+#            ArnLike: 
+#              aws:SourceArn: !Sub "arn:aws:sts::${AWS::AccountId}:assumed-role/ThanosRegRoleTemplate-IamRoleExtractor-*/optimizador-dataset"
+#          Resource: !Sub "arn:aws:sns::${AWS::Region}:${AWS::AccountId}:data-ingestion-pipeline-error-${env}"
+#      Topics:
+#      - !Ref dataIngestPipelineErrorTopic
+        
+  MySQLRdsInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: '20'
+      AvailabilityZone: 'us-east-1a'
+      #CharacterSetName: 'utf8mb4'
+      DBInstanceClass: 'db.m5.large'
+      DBInstanceIdentifier: !Sub "mysql-thanos-${env}"
+      #DBName: String
+      DBParameterGroupName: 'default.mysql8.0'
+      DBSubnetGroupName: 'default-vpc-05aacd6afb0ad3148'
+      DeleteAutomatedBackups: 'false'
+      DeletionProtection: 'false'
+      EnableCloudwatchLogsExports: 
+        - 'audit'
+        - 'error'
+        - 'slowquery'
+      Engine: 'mysql'
+      EngineVersion: '8.0.28'
+      LicenseModel: 'general-public-license'
+      MasterUsername: 'admin'
+      MasterUserPassword: !Ref DBPassword
+      OptionGroupName: 'default:mysql-8-0'
+      Port: '3306'
+      PreferredMaintenanceWindow: 'sat:10:30-sat:11:00'
+      #ProcessorFeatures: 
+      #  - ProcessorFeature
+      PubliclyAccessible: 'false'
+      #StorageEncrypted: Boolean
+      StorageType: 'gp2'
+      VPCSecurityGroups: 
+        - 'sg-063dde36866c4efb7'

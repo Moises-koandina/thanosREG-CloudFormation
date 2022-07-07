@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: "Cloudfront Thanos Regional"
+
+Parameters:
+  env:
+    Type: "String"
+    Description: Environment name. (dev/qa/prod)
+    Default: "dev"
+  IsoCountryCode:
+    Type: "String"
+    Description: ISO 3166-1 alpha-2 country code. (ar/cl/py/etc.)
+    Default: "py"  
+
+Resources:
+  OriginAccessId:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub "${IsoCountryCode}-${env} s3's OAI"
+
+  cloudfrontdistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+          #Aliases: 
+          #  - String
+          #CacheBehaviors: 
+          DefaultCacheBehavior:
+            AllowedMethods: 
+              - 'GET'
+              - 'HEAD'
+              - 'OPTIONS'
+            #CachedMethods: 
+            #  - String
+            CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
+            #Compress: Boolean
+            #FieldLevelEncryptionId: String
+            #FunctionAssociations: 
+            #  - FunctionAssociation
+            #LambdaFunctionAssociations: 
+            #  - LambdaFunctionAssociation
+            #OriginRequestPolicyId: String
+            #RealtimeLogConfigArn: String
+            #ResponseHeadersPolicyId: String
+            TargetOriginId: !Sub "front-${IsoCountryCode}-thanos-reg-${env}"
+            #TrustedKeyGroups: 
+            #  - String
+            #TrustedSigners: 
+            #  - String
+            ViewerProtocolPolicy: "allow-all"
+          Comment: !Sub "Main Cloudfront Distribution - ${IsoCountryCode}-thanos-reg-${env}"
+          #CustomErrorResponses: 
+          #  - CustomErrorResponse
+          #DefaultCacheBehavior: 
+          #  DefaultCacheBehavior
+          DefaultRootObject: "index.html"
+          Enabled: "true"
+          #HttpVersion: String
+          IPV6Enabled: "false"
+          #Logging: 
+          #  Logging
+          #OriginGroups: 
+          #  OriginGroups
+          Origins:
+            - S3OriginConfig:
+                OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessId}"
+              Id: !Sub "front-${IsoCountryCode}-thanos-reg-${env}"
+              #ConnectionAttempts: Integer
+              #ConnectionTimeout: Integer
+              DomainName: !Sub "front-${IsoCountryCode}-thanos-reg-${env}.s3.${AWS::Region}.amazonaws.com"
+              
+              #OriginCustomHeaders: 
+              #  - OriginCustomHeader
+              #OriginPath: String
+              #OriginShield: 
+              #  OriginShield
+                
+            #  - CustomOriginConfig:
+            #      #HTTPPort: Integer
+            #      #HTTPSPort: Integer
+            #      #OriginKeepaliveTimeout: Integer
+            #      OriginProtocolPolicy: "match-viewer"
+            #      #OriginReadTimeout: Integer
+            #      OriginSSLProtocols: 
+            #        - "SSLv3"
+              
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Sub "front-${IsoCountryCode}-thanos-reg-${env}/*"
+      PolicyDocument:
+        Id: !Sub "PolicyForCloudFrontPrivateContent-front-${IsoCountryCode}-thanos-reg-${env}"
+        Statement:
+        - Sid: '1'
+          Effect: Allow
+          Principal:
+            AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${OriginAccessId}"
+          Action: s3:GetObject
+          Resource: !Sub "arn:aws:s3:::front-${IsoCountryCode}-thanos-reg-${env}/*"

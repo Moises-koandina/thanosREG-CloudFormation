@@ -203,6 +203,22 @@ Resources:
         - AttributeName: "componente"
           KeyType: RANGE
 
+  DynamoDBTableOrchest:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: logOrchest
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "modelo_tabla_cp"
+          AttributeType: "S"
+        - AttributeName: "fecha_hora"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "modelo_tabla_cp"
+          KeyType: HASH
+        - AttributeName: "fecha_hora"
+          KeyType: RANGE
+
   BucketOutput:
     Type: AWS::S3::Bucket
     Properties:
@@ -395,7 +411,13 @@ Resources:
       MemorySize: 2048
       Role: !ImportValue ArnIamRoleExtractor
       Layers:
-        [!Ref "LayerDataWrangler", !Ref "LayerPynwrfcLibs", !Ref "LayerSap"]
+        [
+          !Ref "LayerDataWrangler",
+          !Ref "LayerPynwrfcLibs",
+          !Ref "LayerSap",
+          !Ref "LayerYml",
+          !Ref "LayerSns",
+        ]
       Runtime: python3.9
       Timeout: 180
       Environment:
@@ -524,6 +546,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -549,6 +572,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -575,6 +599,7 @@ Resources:
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
       Runtime: python3.9
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Timeout: 20
       Environment:
         Variables:
@@ -599,6 +624,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -624,6 +650,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -649,6 +676,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -674,6 +702,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 30
       Environment:
@@ -699,6 +728,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 30
       Environment:
@@ -725,6 +755,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -750,6 +781,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -775,6 +807,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -800,6 +833,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -825,6 +859,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -850,6 +885,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 20
       Environment:
@@ -875,6 +911,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 30
       Environment:
@@ -900,6 +937,7 @@ Resources:
       Handler: lambda_function.lambda_handler
       MemorySize: 256
       Role: !ImportValue ArnIamRoleApi
+      Layers: [!Ref "LayerYml", !Ref "LayerSns"]
       Runtime: python3.9
       Timeout: 30
       Environment:

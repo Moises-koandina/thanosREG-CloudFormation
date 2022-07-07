@@ -1,0 +1,24 @@
+#Cognito Pool
+# cognitoUserPool:
+#   Type: AWS::Cognito::UserPool
+#   Properties:
+#     UserPoolName: !Sub "SSOAzureAD-${env}"
+#     UsernameConfiguration:
+#       CaseSensitive: false
+#     AdminCreateUserConfig:
+#       AllowAdminCreateUserOnly: true
+#     Policies:
+#       PasswordPolicy:
+#         MinimumLength: 8
+#         RequireLowercase: true
+#         RequireSymbols: true
+#         RequireUppercase: true
+#         TemporaryPasswordValidityDays: 7
+#     UsernameAttributes:
+#       - email
+#     MfaConfiguration: "OFF"
+#     Schema:
+#       - AttributeDataType: String
+#         DeveloperOnlyAttribute: false
+#         Mutable: true
+#         Name: email
