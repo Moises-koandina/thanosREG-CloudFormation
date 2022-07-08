@@ -1305,9 +1305,118 @@ Resources:
         MetricName: "WebACLMetric"
       Capacity: 1
 
+  EventRuleLambdaSAP:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: ThanosReg
+      Description: Inicia la Extraccion SAP
+      State: DISABLED
+      ScheduleExpression: cron(*/20 * * * ? *)
+      Targets:
+        - Arn: !GetAtt LambdasapToAws.Arn
+          Id: "TargetLambdaSAP"
+
+  EventBridgeLambdaSAPPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdasapToAws.Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt EventRuleLambdaSAP.Arn
+
 Outputs:
-  lambdamodell001:
-    Value: !GetAtt LambdaStatusTransportes.Arn
-    Description: api status-transporte
+  LambdaDateupdateApiA:
+    Value: !GetAtt LambdaDateupdateApiA.Arn
+    Description: api LambdaDateupdateApiA
     Export:
-      Name: "ar-status-transporte"
+      Name: "LambdaDateupdateApiA"
+
+  LambdaFiltrosApiA:
+    Value: !GetAtt LambdaFiltrosApiA.Arn
+    Description: api LambdaFiltrosApiA
+    Export:
+      Name: "LambdaFiltrosApiA"
+
+  LambdaMenuApiA:
+    Value: !GetAtt LambdaMenuApiA.Arn
+    Description: api LambdaMenuApiA
+    Export:
+      Name: "LambdaMenuApiA"
+
+  LambdaStatusPosicionCargaPApiA:
+    Value: !GetAtt LambdaStatusPosicionCargaPApiA.Arn
+    Description: api LambdaStatusPosicionCargaPApiA
+    Export:
+      Name: "LambdaStatusPosicionCargaPApiA"
+
+  LambdaStatusPosicionCargaApiA:
+    Value: !GetAtt LambdaStatusPosicionCargaApiA.Arn
+    Description: api LambdaStatusPosicionCargaApiA
+    Export:
+      Name: "LambdaStatusPosicionCargaApiA"
+
+  LambdaStatusCentroCApiA:
+    Value: !GetAtt LambdaStatusCentroCApiA.Arn
+    Description: api LambdaStatusCentroCApiA
+    Export:
+      Name: "LambdaStatusCentroCApiA"
+
+  LambdaStatusCentroTApiA:
+    Value: !GetAtt LambdaStatusCentroTApiA.Arn
+    Description: api LambdaStatusCentroTApiA
+    Export:
+      Name: "LambdaStatusCentroTApiA"
+
+  LambdaStatusTransportesApiA:
+    Value: !GetAtt LambdaStatusTransportesApiA.Arn
+    Description: api LambdaStatusTransportesApiA
+    Export:
+      Name: "LambdaStatusTransportesApiA"
+
+  LambdaDateupdateApiP:
+    Value: !GetAtt LambdaDateupdateApiP.Arn
+    Description: api LambdaDateupdateApiP
+    Export:
+      Name: "LambdaDateupdateApiP"
+
+  LambdaFiltrosApiP:
+    Value: !GetAtt LambdaFiltrosApiP.Arn
+    Description: api LambdaFiltrosApiP
+    Export:
+      Name: "LambdaFiltrosApiP"
+
+  LambdaMenuApiP:
+    Value: !GetAtt LambdaMenuApiP.Arn
+    Description: api LambdaMenuApiP
+    Export:
+      Name: "LambdaMenuApiP"
+
+  LambdaStatusPosicionCargaPApiP:
+    Value: !GetAtt LambdaStatusPosicionCargaPApiP.Arn
+    Description: api LambdaStatusPosicionCargaPApiP
+    Export:
+      Name: "LambdaStatusPosicionCargaPApiP"
+
+  LambdaStatusPosicionCargaApiP:
+    Value: !GetAtt LambdaStatusPosicionCargaApiP.Arn
+    Description: api LambdaStatusPosicionCargaApiP
+    Export:
+      Name: "LambdaStatusPosicionCargaApiP"
+
+  LambdaStatusCentroCApiP:
+    Value: !GetAtt LambdaStatusCentroCApiP.Arn
+    Description: api LambdaStatusCentroCApiP
+    Export:
+      Name: "LambdaStatusCentroCApiP"
+
+  LambdaStatusCentroTApiP:
+    Value: !GetAtt LambdaStatusCentroTApiP.Arn
+    Description: api LambdaStatusCentroTApiP
+    Export:
+      Name: "LambdaStatusCentroTApiP"
+
+  LambdaStatusTransportesApiP:
+    Value: !GetAtt LambdaStatusTransportesApiP.Arn
+    Description: api LambdaStatusTransportesApiP
+    Export:
+      Name: "LambdaStatusTransportesApiP"
