@@ -1,77 +1,46 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Lambda front Integration ThanosCL project v4
+Description: RDS
 
 Parameters:
   env:
     Type: "String"
     Description: Environment name. (dev/qa/prod/cbo)
     Default: "dev"
+  DBPassword:
+    Type: "String"
+    Description: Password BD
+    Default: "ASD123ASD"
+  networkStackName:
+    Type: "String"
+    Description: networkStackName
+    Default: "vpc-devregional-thanos"
 
 Resources:
-  #Configuracion de WAF
-  AndinaIpSet:
-    Type: AWS::WAFv2::IPSet
+  MySQLRdsInstance:
+    Type: AWS::RDS::DBInstance
     Properties:
-      Description: "IPs publicas Andina"
-      Name: !Sub "IPs-${AWS::StackName}-${env}"
-      Scope: CLOUDFRONT
-      IPAddressVersion: IPV4
-      Addresses:
-        - "190.215.193.68/32"
-        - "190.215.193.69/32"
-        - "190.215.193.70/32"
-        - "200.70.33.66/32"
-        - "190.221.175.4/32"
-        - "181.13.90.170/32"
-
-  ThanosIpSet:
-    Type: AWS::WAFv2::IPSet
-    Properties:
-      Description: "ThanosUsers"
-      Name: !Sub "thanos-${AWS::StackName}-${env}"
-      Scope: CLOUDFRONT
-      IPAddressVersion: IPV4
-      Addresses:
-        - "201.241.174.175/32"
-        - "192.168.0.12/32"
-
-  #Waf para Cloudfront
-  DefaultRestrictionWebACL2:
-    Type: AWS::WAFv2::WebACL
-    DependsOn:
-      - AndinaIpSet
-      - ThanosIpSet
-    Properties:
-      Name: !Sub "WAF-${AWS::StackName}-front-${env}"
-      Scope: CLOUDFRONT
-      DefaultAction:
-        Block: {}
-      Description: "Permitir acceso IP publica Andina"
-      Rules:
-        - Name: "RedAndina"
-          Priority: 0
-          Statement:
-            IPSetReferenceStatement:
-              ARN: !GetAtt AndinaIpSet.Arn
-          Action:
-            Allow: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: "IpLimitationRule"
-        - Name: "ThanosUsers"
-          Priority: 1
-          Statement:
-            IPSetReferenceStatement:
-              ARN: !GetAtt ThanosIpSet.Arn
-          Action:
-            Allow: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: "IpLimitationRule"
-      VisibilityConfig:
-        SampledRequestsEnabled: true
-        CloudWatchMetricsEnabled: true
-        MetricName: "WebACLMetric"
-      Capacity: 1
+      AllocatedStorage: "40"
+      AvailabilityZone: "us-east-1a"
+      DBInstanceClass: "db.m5.large"
+      DBInstanceIdentifier: !Sub "thanos-regional-${env}"
+      DBName: "thanos-regional"
+      DBParameterGroupName: "default.mysql8.0"
+      DBSubnetGroupName: "default-vpc-05aacd6afb0ad3148"
+      DeleteAutomatedBackups: "false"
+      DeletionProtection: "false"
+      EnableCloudwatchLogsExports:
+        - "audit"
+        - "error"
+        - "slowquery"
+      Engine: "mysql"
+      EngineVersion: "8.0.28"
+      LicenseModel: "general-public-license"
+      MasterUsername: "thanosReg"
+      MasterUserPassword: !Ref DBPassword
+      OptionGroupName: "default:mysql-8-0"
+      Port: "3308"
+      PreferredMaintenanceWindow: "sat:10:30-sat:11:00"
+      PubliclyAccessible: "false"
+      StorageType: "gp2"
+      VPCSecurityGroups:
+        - "sg-063dde36866c4efb7"

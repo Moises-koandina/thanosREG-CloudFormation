@@ -1130,6 +1130,48 @@ Resources:
             Action: s3:GetObject
             Resource: !Sub "arn:aws:s3:::front-py-thanos-reg-${env}/*"
 
+  SHThanosAr:
+    Type: AWS::CloudFront::Function
+    Properties:
+      AutoPublish: true
+      FunctionCode: |
+        function handler(event) {
+          var response = event.response;
+          var headers = response.headers;
+
+          headers['strict-transport-security'] = { value: 'max-age=63072000'}; 
+          headers['x-xss-protection'] = {value: '1; mode=block'};
+          headers['x-frame-options'] = {value: 'DENY'};
+          headers['x-content-type-options'] = { value: 'nosniff'};
+
+          return response;
+        }
+      FunctionConfig:
+        Comment: !Sub "Apply security headers on ${env}"
+        Runtime: cloudfront-js-1.0
+      Name: SHThanosAr
+
+  SHThanosPy:
+    Type: AWS::CloudFront::Function
+    Properties:
+      AutoPublish: true
+      FunctionCode: |
+        function handler(event) {
+          var response = event.response;
+          var headers = response.headers;
+
+          headers['strict-transport-security'] = { value: 'max-age=63072000'}; 
+          headers['x-xss-protection'] = {value: '1; mode=block'};
+          headers['x-frame-options'] = {value: 'DENY'};
+          headers['x-content-type-options'] = { value: 'nosniff'};
+
+          return response;
+        }
+      FunctionConfig:
+        Comment: !Sub "Apply security headers on ${env}"
+        Runtime: cloudfront-js-1.0
+      Name: SHThanosPy
+
   CloudFrontAr:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -1142,6 +1184,9 @@ Resources:
           CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
           TargetOriginId: !Sub "front-ar-thanos-reg-${env}"
           ViewerProtocolPolicy: "allow-all"
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt SHThanosAr.FunctionMetadata.FunctionARN
         Comment: !Sub "Cloudfront Distribution - ar-thanos-reg-${env}"
         DefaultRootObject: "index.html"
         Enabled: "true"
@@ -1165,6 +1210,9 @@ Resources:
           CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6"
           TargetOriginId: !Sub "front-py-thanos-reg-${env}"
           ViewerProtocolPolicy: "allow-all"
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt SHThanosPy.FunctionMetadata.FunctionARN
         Comment: !Sub "Cloudfront Distribution - py-thanos-reg-${env}"
         DefaultRootObject: "index.html"
         Enabled: "true"
