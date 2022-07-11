@@ -1,0 +1,1463 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Resources thanos Regional
+
+Parameters:
+  env:
+    Type: "String"
+    Description: Environme  nt name. (dev/qa/prod)
+    Default: "dev"
+
+  apiGatewayStageName:
+    Type: String
+    Default: prod
+
+Resources:
+  ResourceAr:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !GetAtt ApiGatewayReg.RootResourceId
+      PathPart: "ar"
+  ResourceArFechaActualizacion:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourceAr
+      PathPart: "fecha-actualizacion"
+  ResourceArFiltros:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourceAr
+      PathPart: "filtros"
+  ResourceArMenu:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourceAr
+      PathPart: "menu"
+  ResourceArPosicionDeCarga:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourceAr
+      PathPart: "posicion-de-carga"
+  ResourceArPosicionDeCargaPallet:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourceArPosicionDeCarga
+      PathPart: "pallet"
+  ResourceArPosicionDeCargaTabla:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourceArPosicionDeCarga
+      PathPart: "tabla"
+  ResourceArStatusCentro:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourceAr
+      PathPart: "status-centro"
+  ResourceArStatusCentroGraficos:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourceArStatusCentro
+      PathPart: "graficos"
+  ResourceArStatusCentroTablas:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourceArStatusCentro
+      PathPart: "tablas"
+  ResourceArStatusTransporte:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourceAr
+      PathPart: "status-transporte"
+  ResourcePy:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !GetAtt ApiGatewayReg.RootResourceId
+      PathPart: "py"
+  ResourcePyFechaActualizacion:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourcePy
+      PathPart: "fecha-actualizacion"
+  ResourcePyFiltros:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourcePy
+      PathPart: "filtros"
+  ResourcePyMenu:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourcePy
+      PathPart: "menu"
+  ResourcePyPosicionDeCarga:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourcePy
+      PathPart: "posicion-de-carga"
+  ResourcePyPosicionDeCargaPallet:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourcePyPosicionDeCarga
+      PathPart: "pallet"
+  ResourcePyPosicionDeCargaTabla:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourcePyPosicionDeCarga
+      PathPart: "tabla"
+  ResourcePyStatusCentro:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourcePy
+      PathPart: "status-centro"
+  ResourcePyStatusCentroGraficos:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourcePyStatusCentro
+      PathPart: "graficos"
+  ResourcePyStatusCentroTablas:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourcePyStatusCentro
+      PathPart: "tablas"
+  ResourcePyStatusTransporte:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ParentId: !Ref ResourcePy
+      PathPart: "status-transporte"
+
+  #ApiGateway
+  ApiGatewayReg:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Name: "thanos-reg"
+      #Name: !Sub '${apiGatewayName}-${env}'
+
+  #Cognito Pool
+  cognitoUserPoolAr:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "SSORegArg-${env}"
+      UsernameConfiguration:
+        CaseSensitive: false
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+          - Name: verified_phone_number
+            Priority: 2
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireSymbols: true
+          RequireUppercase: true
+          TemporaryPasswordValidityDays: 7
+      UsernameAttributes:
+        - email
+      MfaConfiguration: "OFF"
+      Schema:
+        - AttributeDataType: String
+          DeveloperOnlyAttribute: false
+          Mutable: true
+          #Required: true
+          Name: email
+      AutoVerifiedAttributes:
+        - email
+
+  cognitoUserPoolPy:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "SSORegPy-${env}"
+      UsernameConfiguration:
+        CaseSensitive: false
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+          - Name: verified_phone_number
+            Priority: 2
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireSymbols: true
+          RequireUppercase: true
+          TemporaryPasswordValidityDays: 7
+      UsernameAttributes:
+        - email
+      MfaConfiguration: "OFF"
+      Schema:
+        - AttributeDataType: String
+          DeveloperOnlyAttribute: false
+          Mutable: true
+          #Required: true
+          Name: email
+      AutoVerifiedAttributes:
+        - email
+
+  #Autorizador API
+  apiGatewayAuthorizerAr:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      IdentitySource: method.request.header.authorization
+      Name: "SSORegArg"
+      ProviderARNs:
+        - Fn::GetAtt:
+            - cognitoUserPoolAr
+            - Arn
+      RestApiId: !Ref ApiGatewayReg
+      Type: COGNITO_USER_POOLS ##!Ref apiGateAuthorizationType
+
+  apiGatewayAuthorizerPy:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      IdentitySource: method.request.header.authorization
+      Name: "SSORegPy"
+      ProviderARNs:
+        - Fn::GetAtt:
+            - cognitoUserPoolPy
+            - Arn
+      RestApiId: !Ref ApiGatewayReg
+      Type: COGNITO_USER_POOLS ##!Ref apiGateAuthorizationType
+
+  apiGatewayUserPoolIdentityProviderAr:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Properties:
+      UserPoolId: !Ref cognitoUserPoolAr
+      ProviderName: "AZURE-AD-AR"
+      ProviderDetails:
+        MetadataURL: "https://login.microsoftonline.com/af5d7ac6-4cdf-4034-a02d-b7ac4a5757f7/federationmetadata/2007-06/federationmetadata.xml?appid=6f1c7b99-dac3-4a33-a9ba-076a2e9a680a"
+      ProviderType: "SAML"
+      AttributeMapping:
+        email: "Attribute"
+      #IdpIdentifiers:
+      #  - "IdpIdentifier"
+
+  apiGatewayUserPoolIdentityProviderPy:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Properties:
+      UserPoolId: !Ref cognitoUserPoolPy
+      ProviderName: "AZURE-AD-PY"
+      ProviderDetails:
+        MetadataURL: "https://login.microsoftonline.com/af5d7ac6-4cdf-4034-a02d-b7ac4a5757f7/federationmetadata/2007-06/federationmetadata.xml?appid=6f1c7b99-dac3-4a33-a9ba-076a2e9a680a"
+      ProviderType: "SAML"
+      AttributeMapping:
+        email: "Attribute"
+      #IdpIdentifiers:
+      #  - "IdpIdentifier"
+
+  apiGatewayUserPoolClientAr:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: "thanosAR"
+      UserPoolId: !Ref cognitoUserPoolAr
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - implicit
+      AllowedOAuthScopes:
+        - email
+        - openid
+      CallbackURLs:
+        - "http://localhost:3000/home"
+      SupportedIdentityProviders:
+        - !Ref apiGatewayUserPoolIdentityProviderAr
+
+  apiGatewayUserPoolClientPy:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: "thanosPy"
+      UserPoolId: !Ref cognitoUserPoolPy
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - implicit
+      AllowedOAuthScopes:
+        - email
+        - openid
+      CallbackURLs:
+        - "http://localhost:3000/home"
+      SupportedIdentityProviders:
+        - !Ref apiGatewayUserPoolIdentityProviderPy
+
+  #Definicion parametros API
+  #Metodos Argentina
+  ApiGatewayArFechaActualizacionOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: fecha-actualizacion-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        ##IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaDateupdateApiA
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArFechaActualizacion
+
+  ApiGatewayArFechaActualizacionGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: fecha-actualizacion
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaDateupdateApiA
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            #method.response.header.Access-Control-Allow-Headers: true
+            #method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArFechaActualizacion
+
+  ApiGatewayArFiltrosOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: filtros-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArFiltros
+
+  ApiGatewayArFiltrosGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: filtros
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaFiltrosApiA
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArFiltros
+
+  ApiGatewayArMenuOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: menu-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArMenu
+
+  ApiGatewayArMenuGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: menu
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaMenuApiA
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArMenu
+
+  ApiGatewayArPosicionDeCargaPalletOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: posicion-de-carga-pallet-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArPosicionDeCargaPallet
+
+  ApiGatewayArPosicionDeCargaPalletGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: posicion-de-carga-pallet
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaStatusPosicionCargaPApiA
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArPosicionDeCargaPallet
+
+  ApiGatewayArPosicionDeCargaTablaOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: posicion-de-carga-tabla-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArPosicionDeCargaTabla
+
+  ApiGatewayArPosicionDeCargaTablaGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: posicion-de-carga-tabla
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaStatusPosicionCargaApiA
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArPosicionDeCargaTabla
+
+  ApiGatewayArStatusCentroGraficosOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-centro-graficos-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArStatusCentroGraficos
+
+  ApiGatewayArStatusCentroGraficosGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-centro-graficos
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaStatusCentroCApiA
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArStatusCentroGraficos
+
+  ApiGatewayArStatusCentroTablasOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-centro-tablas-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArStatusCentroTablas
+
+  ApiGatewayArStatusCentroTablasGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-centro-tablas
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaStatusCentroTApiA
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArStatusCentroTablas
+
+  ApiGatewayArStatusTransporteOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-transporte-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArStatusTransporte
+
+  ApiGatewayArStatusTransporteGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-transporte
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaStatusTransportesApiA
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourceArStatusTransporte
+
+  ##Metodos Paraguay
+  ApiGatewayPyFechaActualizacionOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: fecha-actualizacion-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyFechaActualizacion
+
+  ApiGatewayPyFechaActualizacionGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: fecha-actualizacion
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaDateupdateApiP
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyFechaActualizacion
+
+  ApiGatewayPyFiltrosOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: filtros-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyFiltros
+
+  ApiGatewayPyFiltrosGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: filtros
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaFiltrosApiP
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyFiltros
+
+  ApiGatewayPyMenuOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: menu-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyMenu
+
+  ApiGatewayPyMenuGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: menu
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaMenuApiP
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyMenu
+
+  ApiGatewayPyPosicionDeCargaPalletOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: posicion-de-carga-pallet-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyPosicionDeCargaPallet
+
+  ApiGatewayPyPosicionDeCargaPalletGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: posicion-de-carga-pallet
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaStatusPosicionCargaPApiP
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyPosicionDeCargaPallet
+
+  ApiGatewayPyPosicionDeCargaTablaOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: posicion-de-carga-tabla-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyPosicionDeCargaTabla
+
+  ApiGatewayPyPosicionDeCargaTablaGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: posicion-de-carga-tabla
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaStatusPosicionCargaApiP
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyPosicionDeCargaTabla
+
+  ApiGatewayPyStatusCentroGraficosOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-centro-graficos-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyStatusCentroGraficos
+
+  ApiGatewayPyStatusCentroGraficosGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-centro-graficos
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaStatusCentroCApiP
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyStatusCentroGraficos
+
+  ApiGatewayPyStatusCentroTablasOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-centro-tablas-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyStatusCentroTablas
+
+  ApiGatewayPyStatusCentroTablasGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-centro-tablas
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaStatusCentroTApiP
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyStatusCentroTablas
+
+  ApiGatewayPyStatusTransporteOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-transporte-option
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: OPTIONS
+      Integration:
+        #PassthroughBehavior: NEVER
+        IntegrationHttpMethod: OPTIONS
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyStatusTransporte
+
+  ApiGatewayPyStatusTransporteGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      OperationName: status-transporte
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      #AuthorizerId: !Ref apiGatewayAuthorizer
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !ImportValue LambdaStatusTransportesApiP
+        RequestTemplates:
+          application/json: ""
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: Empty
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+      RestApiId: !Ref ApiGatewayReg
+      ResourceId: !Ref ResourcePyStatusTransporte
+
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ApiGatewayPyFechaActualizacionOptions
+      - ApiGatewayArFechaActualizacionGet
+      - ApiGatewayArFiltrosOptions
+      - ApiGatewayArFiltrosGet
+      - ApiGatewayArMenuOptions
+      - ApiGatewayArMenuGet
+      - ApiGatewayArPosicionDeCargaPalletOptions
+      - ApiGatewayArPosicionDeCargaPalletGet
+      - ApiGatewayArPosicionDeCargaTablaOptions
+      - ApiGatewayArPosicionDeCargaTablaGet
+      - ApiGatewayArStatusCentroGraficosOptions
+      - ApiGatewayArStatusCentroGraficosGet
+      - ApiGatewayArStatusCentroTablasOptions
+      - ApiGatewayArStatusCentroTablasGet
+      - ApiGatewayArStatusTransporteOptions
+      - ApiGatewayArStatusTransporteGet
+      - ApiGatewayPyFechaActualizacionOptions
+      - ApiGatewayPyFechaActualizacionGet
+      - ApiGatewayPyFiltrosOptions
+      - ApiGatewayPyFiltrosGet
+      - ApiGatewayPyMenuOptions
+      - ApiGatewayPyMenuGet
+      - ApiGatewayPyPosicionDeCargaPalletOptions
+      - ApiGatewayPyPosicionDeCargaPalletGet
+      - ApiGatewayPyPosicionDeCargaTablaOptions
+      - ApiGatewayPyPosicionDeCargaTablaGet
+      - ApiGatewayPyStatusCentroGraficosOptions
+      - ApiGatewayPyStatusCentroGraficosGet
+      - ApiGatewayPyStatusCentroTablasOptions
+      - ApiGatewayPyStatusCentroTablasGet
+      - ApiGatewayPyStatusTransporteOptions
+      - ApiGatewayPyStatusTransporteGet
+    Properties:
+      RestApiId: !Ref ApiGatewayReg
+      ##StageName: !Ref ApiGatewayStageThanos
+
+  ##ApiGatewayPermission
+  ##Ar
+  ApiGatewayInvokePermissionArFechaActualizacion:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaDateupdateApiA
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/fecha-actualizacion
+
+  ApiGatewayInvokePermissionArFiltros:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaFiltrosApiA
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/filtros
+
+  ApiGatewayInvokePermissionArMenu:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaMenuApiA
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/menu
+
+  ApiGatewayInvokePermissionArPosicionDeCargaPallet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaStatusPosicionCargaPApiA
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/posicion-de-carga/pallet
+
+  ApiGatewayInvokePermissionArPosicionDeCargaTabla:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaStatusPosicionCargaApiA
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/posicion-de-carga/tabla
+
+  ApiGatewayInvokePermissionArStatusCentroGraficos:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaStatusCentroCApiA
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/status-centro/graficos
+
+  ApiGatewayInvokePermissionArStatusCentroTablas:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaStatusCentroTApiA
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/status-centro/tablas
+
+  ApiGatewayInvokePermissionArStatusTransporte:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaStatusTransportesApiA
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/status-transporte
+
+  ##Py
+  ApiGatewayInvokePermissionPyFechaActualizacion:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaDateupdateApiP
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/fecha-actualizacion
+
+  ApiGatewayInvokePermissionPyFiltros:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaFiltrosApiP
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/filtros
+
+  ApiGatewayInvokePermissionPyMenu:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaMenuApiP
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/menu
+
+  ApiGatewayInvokePermissionPyPosicionDeCargaPallet:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaStatusPosicionCargaPApiP
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/posicion-de-carga/pallet
+
+  ApiGatewayInvokePermissionPyPosicionDeCargaTabla:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaStatusPosicionCargaApiP
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/posicion-de-carga/tabla
+
+  ApiGatewayInvokePermissionPyStatusCentroGraficos:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaStatusCentroCApiP
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/status-centro/graficos
+
+  ApiGatewayInvokePermissionPyStatusCentroTablas:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaStatusCentroTApiP
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/status-centro/tablas
+
+  ApiGatewayInvokePermissionPyStatusTransporte:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !ImportValue LambdaStatusTransportesApiP
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/status-transporte
+
+  ApiGatewayStageThanos:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: thanos
+      Description: Prod Stage
+      RestApiId: !Ref ApiGatewayReg
+      DeploymentId: !Ref ApiGatewayDeployment
+      #DocumentationVersion: !Ref MyDocumentationVersion
+      #ClientCertificateId: !Ref ClientCertificate
+      Variables:
+        Stack: Prod
+      MethodSettings:
+        - ResourcePath: /
+          HttpMethod: GET
+          MetricsEnabled: "true"
+          DataTraceEnabled: "false"
+        - ResourcePath: /stack
+          HttpMethod: POST
+          MetricsEnabled: "true"
+          DataTraceEnabled: "false"
+          ThrottlingBurstLimit: "999"
+        - ResourcePath: /stack
+          HttpMethod: GET
+          MetricsEnabled: "true"
+          DataTraceEnabled: "false"
+          ThrottlingBurstLimit: "555"
