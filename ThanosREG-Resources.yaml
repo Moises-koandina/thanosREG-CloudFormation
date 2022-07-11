@@ -307,6 +307,25 @@ Resources:
       VpcId: !ImportValue
         "Fn::Sub": "${networkStackName}-VPCID"
 
+  SecurityGroupRDS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG para BD
+      GroupName: sgfor-rds-SG
+      SecurityGroupIngress:
+        - IpProtocol: TCP
+          CidrIp: 181.42.160.0/22
+          Description: "Redes de Andina VPN"
+          FromPort: 3307
+          ToPort: 3307
+        - IpProtocol: TCP
+          SourceSecurityGroupId: !Sub ${SecurityGroupThanosSAP}
+          Description: "From Models"
+          FromPort: 3307
+          ToPort: 3307
+      VpcId: !ImportValue
+        "Fn::Sub": "${networkStackName}-VPCID"
+
   #Ingesta + Modelos
   LambdaStatusTransportes:
     Type: AWS::Lambda::Function
