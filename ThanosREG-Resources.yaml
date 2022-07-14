@@ -31,6 +31,14 @@ Parameters:
     Type: "String"
     Description: Host to connect with SAP
     Default: "181.42.96.148"
+  AzureADCognitoARLink:
+    Type: "String"
+    Description: URL respuesta microsoft AD-Cognito
+    Default: "https://login.microsoftonline.com/af5d7ac6-4cdf-4034-a02d-b7ac4a5757f7/federationmetadata/2007-06/federationmetadata.xml?appid=6f1c7b99-dac3-4a33-a9ba-076a2e9a680a"
+  AzureADCognitoPYLink:
+    Type: "String"
+    Description: URL respuesta microsoft AD-Cognito
+    Default: "https://login.microsoftonline.com/af5d7ac6-4cdf-4034-a02d-b7ac4a5757f7/federationmetadata/2007-06/federationmetadata.xml?appid=6f1c7b99-dac3-4a33-a9ba-076a2e9a680a"
 
 Resources:
   LayerDataWrangler:
@@ -233,6 +241,22 @@ Resources:
         - AttributeName: "fecha"
           KeyType: HASH
         - AttributeName: "hora"
+          KeyType: RANGE
+
+  DynamoDBFiltros:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: modelsFilter
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "filtro"
+          AttributeType: "S"
+        - AttributeName: "tipo"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "filtro"
+          KeyType: HASH
+        - AttributeName: "tipo"
           KeyType: RANGE
 
   BucketOutput:
