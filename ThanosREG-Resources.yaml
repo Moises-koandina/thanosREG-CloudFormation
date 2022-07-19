@@ -14,31 +14,31 @@ Parameters:
   userNameSap:
     Type: "String"
     Description: User Name to connect with SAP
-    Default: "thanoscom"
+    Default: "usuario"
   passSap:
     Type: "String"
     Description: Password to connect with SAP
-    Default: "4nd1n4.)!"
+    Default: "password"
   ipSapPbr:
     Type: "String"
     Description: Host to connect with SAP
-    Default: "181.42.98.26"
+    Default: "ip"
   ipSapQbr:
     Type: "String"
     Description: Host to connect with SAP
-    Default: "181.42.96.191"
+    Default: "ip"
   ipSapXbr:
     Type: "String"
     Description: Host to connect with SAP
-    Default: "181.42.96.148"
+    Default: "ip"
   AzureADCognitoARLink:
     Type: "String"
     Description: URL respuesta microsoft AD-Cognito
-    Default: "https://login.microsoftonline.com/af5d7ac6-4cdf-4034-a02d-b7ac4a5757f7/federationmetadata/2007-06/federationmetadata.xml?appid=6f1c7b99-dac3-4a33-a9ba-076a2e9a680a"
+    Default: "https://login.microsoftonline.com/url"
   AzureADCognitoPYLink:
     Type: "String"
     Description: URL respuesta microsoft AD-Cognito
-    Default: "https://login.microsoftonline.com/af5d7ac6-4cdf-4034-a02d-b7ac4a5757f7/federationmetadata/2007-06/federationmetadata.xml?appid=6f1c7b99-dac3-4a33-a9ba-076a2e9a680a"
+    Default: "https://login.microsoftonline.com/url"
 
 Resources:
   LayerDataWrangler:
@@ -246,7 +246,7 @@ Resources:
   DynamoDBFiltros:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: modelsFilter
+      TableName: modelsFilters
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: "filtro"
@@ -278,6 +278,17 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: deltas
+                  - Name: suffix
+                    Value: .csv
+            Function: !GetAtt LambdaEtl.Arn
 
   BucketBackup:
     Type: AWS::S3::Bucket
@@ -318,6 +329,14 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+
+  S3InvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaEtl
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub arn:aws:s3:::input-thanos-reg-${env}
 
   SecurityGroupThanosSAP:
     Type: AWS::EC2::SecurityGroup
@@ -1415,6 +1434,144 @@ Resources:
       Principal: events.amazonaws.com
       SourceArn: !GetAtt EventRuleLambdaSAP.Arn
 
+  #Cognito Pool
+  cognitoUserPoolAr:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "SSOThanosReg-ar-${env}"
+      UsernameConfiguration:
+        CaseSensitive: false
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+          - Name: verified_phone_number
+            Priority: 2
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireSymbols: true
+          RequireUppercase: true
+          RequireNumbers: true
+          TemporaryPasswordValidityDays: 7
+      #UsernameAttributes: ###############Cuando se pase sacar esta propiedad
+      #  - email
+      MfaConfiguration: "OFF"
+      Schema:
+        - AttributeDataType: String
+          DeveloperOnlyAttribute: false
+          Mutable: true
+          #Required: true
+          Name: email
+      AutoVerifiedAttributes:
+        - email
+
+  cognitoUserPoolPy:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "SSOThanosReg-py-${env}"
+      UsernameConfiguration:
+        CaseSensitive: false
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+          - Name: verified_phone_number
+            Priority: 2
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireSymbols: true
+          RequireUppercase: true
+          RequireNumbers: true
+          TemporaryPasswordValidityDays: 7
+      #UsernameAttributes:      ###############Cuando se pase sacar esta propiedad
+      #  - email
+      MfaConfiguration: "OFF"
+      Schema:
+        - AttributeDataType: String
+          DeveloperOnlyAttribute: false
+          Mutable: true
+          #Required: true
+          Name: email
+      AutoVerifiedAttributes:
+        - email
+
+  #UserPoolIdentity
+  cognitoUserPoolIdentityProviderAr:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Properties:
+      UserPoolId: !Ref cognitoUserPoolAr
+      ProviderName: !Sub "AZURE-AD-AR-${env}"
+      ProviderDetails:
+        MetadataURL: !Sub "${AzureADCognitoARLink}"
+      ProviderType: "SAML"
+      AttributeMapping:
+        email: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+
+  cognitoUserPoolIdentityProviderPy:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Properties:
+      UserPoolId: !Ref cognitoUserPoolPy
+      ProviderName: !Sub "AZURE-AD-PY-${env}"
+      ProviderDetails:
+        MetadataURL: !Sub "${AzureADCognitoPYLink}"
+      ProviderType: "SAML"
+      AttributeMapping:
+        email: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+
+  #UserPoolClient
+  cognitoUserPoolClientAr:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: "thanosAr"
+      UserPoolId: !Ref cognitoUserPoolAr
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - implicit
+      AllowedOAuthScopes:
+        - email
+        - openid
+      CallbackURLs:
+        - "http://localhost:3000/home"
+      SupportedIdentityProviders:
+        - !Ref cognitoUserPoolIdentityProviderAr
+
+  cognitoUserPoolClientPy:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: "thanosPy"
+      UserPoolId: !Ref cognitoUserPoolPy
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - implicit
+      AllowedOAuthScopes:
+        - email
+        - openid
+      CallbackURLs:
+        - "http://localhost:3000/home"
+      SupportedIdentityProviders:
+        - !Ref cognitoUserPoolIdentityProviderPy
+
+  #UserPoolDomain
+  cognitoUserPoolDomainAr:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub "thanosreg-ar-${env}" #!Sub 'SSORegPy-${env}'
+      UserPoolId: !Ref cognitoUserPoolAr
+
+  cognitoUserPoolDomainPy:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub "thanosreg-py-${env}" #!Sub 'SSORegPy-${env}'
+      UserPoolId: !Ref cognitoUserPoolPy
+
 Outputs:
   LambdaDateupdateApiA:
     Value: !GetAtt LambdaDateupdateApiA.Arn
@@ -1511,3 +1668,15 @@ Outputs:
     Description: api LambdaStatusTransportesApiP
     Export:
       Name: "LambdaStatusTransportesApiP"
+
+  cognitoUserPoolAr:
+    Value: !GetAtt cognitoUserPoolAr.Arn
+    Description: api cognitoUserPoolAr
+    Export:
+      Name: "cognitoUserPoolAr"
+
+  cognitoUserPoolPy:
+    Value: !GetAtt cognitoUserPoolPy.Arn
+    Description: api cognitoUserPoolPy
+    Export:
+      Name: "cognitoUserPoolPy"
