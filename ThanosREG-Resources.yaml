@@ -6,45 +6,39 @@ Parameters:
   env:
     Type: "String"
     Description: Environme  nt name. (dev/qa/prod)
-    Default: "dev"
+  VpcSG:
+    Type: "String"
+    Description: SG from VPC
   networkStackName:
     Type: "String"
     Description: networkStackName
-    Default: "vpc-devregional-thanos"
   userNameSap:
     Type: "String"
     Description: User Name to connect with SAP
-    Default: "usuario"
   passSap:
     Type: "String"
     Description: Password to connect with SAP
-    Default: "password"
   ipSapPbr:
     Type: "String"
     Description: Host to connect with SAP
-    Default: "ip"
   ipSapQbr:
     Type: "String"
     Description: Host to connect with SAP
-    Default: "ip"
   ipSapXbr:
     Type: "String"
     Description: Host to connect with SAP
-    Default: "ip"
   AzureADCognitoARLink:
     Type: "String"
     Description: URL respuesta microsoft AD-Cognito
-    Default: "https://login.microsoftonline.com/url"
   AzureADCognitoPYLink:
     Type: "String"
     Description: URL respuesta microsoft AD-Cognito
-    Default: "https://login.microsoftonline.com/url"
   SubscriptionEndPoint1:
     Type: String
-    Description: The endpoint 1 that receives notifications
+    Description: The endpoint 1 that receives notifications (email adress for example)
   SubscriptionEndPoint2:
     Type: String
-    Description: The endpoint 2 that receives notifications
+    Description: The endpoint 2 that receives notifications (email adress for example)
   SubscriptionProtocol:
     Type: String
     Description: The subscription protocol
@@ -57,27 +51,36 @@ Parameters:
       - sqs
       - application
       - lambda
-    Default: email
   TopicNameApis:
     Type: "String"
     Description: Topic Name APIs
-    Default: "apis-execution-errors"
   TopicNameETL:
     Type: "String"
     Description: Topic Name ETL
-    Default: "etl-execution-errors"
   TopicNameModels:
     Type: "String"
     Description: Topic Name Models
-    Default: "models-execution-errors"
   TopicNameIngestion:
     Type: "String"
     Description: Topic Name Ingestion
-    Default: "ingestion-execution-errors"
   TopicNameOrchestration:
     Type: "String"
     Description: Topic Name Orchestration
-    Default: "orchestration-execution-errors"
+  InstanceIdentifierP:
+    Type: "String"
+    Description: Instance Name
+  UserNameP:
+    Type: "String"
+    Description: User Name
+  UserPasswordP:
+    Type: "String"
+    Description: Password BD
+  PortNumberP:
+    Type: "String"
+    Description: Port Number
+  DBNameP:
+    Type: "String"
+    Description: DataBase Name
 
 Resources:
   LayerDataWrangler:
@@ -1661,6 +1664,41 @@ Resources:
           Endpoint: !Ref SubscriptionEndPoint1
         - Protocol: !Ref SubscriptionProtocol
           Endpoint: !Ref SubscriptionEndPoint2
+
+  MySQLRdsInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: "500"
+      AllowMajorVersionUpgrade: False
+      AvailabilityZone: "us-east-1a"
+      AutoMinorVersionUpgrade: True
+      BackupRetentionPeriod: 0
+      DBInstanceClass: "db.r5.large"
+      DBInstanceIdentifier: !Ref InstanceIdentifierP
+      DBName: !Ref DBNameP
+      DBSubnetGroupName: !Ref VpcSG
+      DeletionProtection: True
+      EnableCloudwatchLogsExports:
+        - "error"
+        - "slowquery"
+      Engine: "mysql"
+      EngineVersion: "8.0.28"
+      LicenseModel: "general-public-license"
+      MasterUsername: !Ref UserNameP
+      MasterUserPassword: !Ref UserPasswordP
+      MaxAllocatedStorage: 5000
+      Port: !Ref PortNumberP
+      PreferredMaintenanceWindow: "sat:10:30-sat:11:00"
+      StorageType: "gp2"
+      VPCSecurityGroups:
+        - !GetAtt SecurityGroupRDS.GroupId
+
+  SecretsManagerThanosReg:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Secrets Manager para Thanos Regional
+      Name: !Ref InstanceIdentifierP
+      SecretString: !Sub '{"username" : "${UserNameP}","pass": "${UserPasswordP}", "engine": "mysql", "host": "${MySQLRdsInstance.Endpoint.Address}", "port": "${PortNumberP}", "dbname": "${DBNameP}", "dbInstanceIdentifier": "${InstanceIdentifierP}"}'
 
 Outputs:
   LambdaDateupdateApiA:
