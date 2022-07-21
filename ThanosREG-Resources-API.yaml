@@ -1164,7 +1164,7 @@ Resources:
       FunctionName: !ImportValue LambdaDateupdateApiA
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/fecha-actualizacion
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/ar/fecha-actualizacion
 
   ApiGatewayInvokePermissionArFiltros:
     Type: AWS::Lambda::Permission
@@ -1172,7 +1172,7 @@ Resources:
       FunctionName: !ImportValue LambdaFiltrosApiA
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/filtros
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/ar/filtros
 
   ApiGatewayInvokePermissionArMenu:
     Type: AWS::Lambda::Permission
@@ -1180,7 +1180,7 @@ Resources:
       FunctionName: !ImportValue LambdaMenuApiA
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/menu
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/ar/menu
 
   ApiGatewayInvokePermissionArPosicionDeCargaPallet:
     Type: AWS::Lambda::Permission
@@ -1188,7 +1188,7 @@ Resources:
       FunctionName: !ImportValue LambdaStatusPosicionCargaPApiA
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/posicion-de-carga/pallet
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/ar/posicion-de-carga/pallet
 
   ApiGatewayInvokePermissionArPosicionDeCargaTabla:
     Type: AWS::Lambda::Permission
@@ -1196,7 +1196,7 @@ Resources:
       FunctionName: !ImportValue LambdaStatusPosicionCargaApiA
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/posicion-de-carga/tabla
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/ar/posicion-de-carga/tabla
 
   ApiGatewayInvokePermissionArStatusCentroGraficos:
     Type: AWS::Lambda::Permission
@@ -1204,7 +1204,7 @@ Resources:
       FunctionName: !ImportValue LambdaStatusCentroCApiA
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/status-centro/graficos
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/ar/status-centro/graficos
 
   ApiGatewayInvokePermissionArStatusCentroTablas:
     Type: AWS::Lambda::Permission
@@ -1212,7 +1212,7 @@ Resources:
       FunctionName: !ImportValue LambdaStatusCentroTApiA
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/status-centro/tablas
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/ar/status-centro/tablas
 
   ApiGatewayInvokePermissionArStatusTransporte:
     Type: AWS::Lambda::Permission
@@ -1220,7 +1220,7 @@ Resources:
       FunctionName: !ImportValue LambdaStatusTransportesApiA
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/ar/status-transporte
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/ar/status-transporte
 
   ##Py
   ApiGatewayInvokePermissionPyFechaActualizacion:
@@ -1229,7 +1229,7 @@ Resources:
       FunctionName: !ImportValue LambdaDateupdateApiP
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/fecha-actualizacion
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/py/fecha-actualizacion
 
   ApiGatewayInvokePermissionPyFiltros:
     Type: AWS::Lambda::Permission
@@ -1237,7 +1237,7 @@ Resources:
       FunctionName: !ImportValue LambdaFiltrosApiP
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/filtros
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/py/filtros
 
   ApiGatewayInvokePermissionPyMenu:
     Type: AWS::Lambda::Permission
@@ -1245,7 +1245,7 @@ Resources:
       FunctionName: !ImportValue LambdaMenuApiP
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/menu
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/py/menu
 
   ApiGatewayInvokePermissionPyPosicionDeCargaPallet:
     Type: AWS::Lambda::Permission
@@ -1253,7 +1253,7 @@ Resources:
       FunctionName: !ImportValue LambdaStatusPosicionCargaPApiP
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/posicion-de-carga/pallet
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/py/posicion-de-carga/pallet
 
   ApiGatewayInvokePermissionPyPosicionDeCargaTabla:
     Type: AWS::Lambda::Permission
@@ -1261,7 +1261,7 @@ Resources:
       FunctionName: !ImportValue LambdaStatusPosicionCargaApiP
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/posicion-de-carga/tabla
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/py/posicion-de-carga/tabla
 
   ApiGatewayInvokePermissionPyStatusCentroGraficos:
     Type: AWS::Lambda::Permission
@@ -1269,7 +1269,7 @@ Resources:
       FunctionName: !ImportValue LambdaStatusCentroCApiP
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/status-centro/graficos
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/py/status-centro/graficos
 
   ApiGatewayInvokePermissionPyStatusCentroTablas:
     Type: AWS::Lambda::Permission
@@ -1277,7 +1277,7 @@ Resources:
       FunctionName: !ImportValue LambdaStatusCentroTApiP
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/status-centro/tablas
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/py/status-centro/tablas
 
   ApiGatewayInvokePermissionPyStatusTransporte:
     Type: AWS::Lambda::Permission
@@ -1285,7 +1285,7 @@ Resources:
       FunctionName: !ImportValue LambdaStatusTransportesApiP
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/py/status-transporte
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayReg}/*/GET/py/status-transporte
 
   ApiGatewayStageThanos:
     Type: AWS::ApiGateway::Stage
