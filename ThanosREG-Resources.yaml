@@ -6,33 +6,39 @@ Parameters:
   env:
     Type: "String"
     Description: Environme  nt name. (dev/qa/prod)
-  VpcSG:
-    Type: "String"
-    Description: SG from VPC
+    Default: "dev"
   networkStackName:
     Type: "String"
     Description: networkStackName
+    Default: "vpc-devregional-thanos"
   userNameSap:
     Type: "String"
     Description: User Name to connect with SAP
+    Default: "usuario"
   passSap:
     Type: "String"
     Description: Password to connect with SAP
+    Default: "password"
   ipSapPbr:
     Type: "String"
     Description: Host to connect with SAP
+    Default: "ip"
   ipSapQbr:
     Type: "String"
     Description: Host to connect with SAP
+    Default: "ip"
   ipSapXbr:
     Type: "String"
     Description: Host to connect with SAP
+    Default: "ip"
   AzureADCognitoARLink:
     Type: "String"
     Description: URL respuesta microsoft AD-Cognito
+    Default: "https://login.microsoftonline.com/url"
   AzureADCognitoPYLink:
     Type: "String"
     Description: URL respuesta microsoft AD-Cognito
+    Default: "https://login.microsoftonline.com/url"
   SubscriptionEndPoint1:
     Type: String
     Description: The endpoint 1 that receives notifications (email adress for example)
@@ -51,36 +57,47 @@ Parameters:
       - sqs
       - application
       - lambda
+    Default: email
   TopicNameApis:
     Type: "String"
     Description: Topic Name APIs
+    Default: "apis-execution-errors"
   TopicNameETL:
     Type: "String"
     Description: Topic Name ETL
+    Default: "etl-execution-errors"
   TopicNameModels:
     Type: "String"
     Description: Topic Name Models
+    Default: "models-execution-errors"
   TopicNameIngestion:
     Type: "String"
     Description: Topic Name Ingestion
+    Default: "ingestion-execution-errors"
   TopicNameOrchestration:
     Type: "String"
     Description: Topic Name Orchestration
+    Default: "orchestration-execution-errors"
   InstanceIdentifierP:
     Type: "String"
     Description: Instance Name
+    Default: "rds-thanosRegional"
   UserNameP:
     Type: "String"
     Description: User Name
+    Default: "thanos"
   UserPasswordP:
     Type: "String"
     Description: Password BD
+    Default: "ThanosReg-2022"
   PortNumberP:
     Type: "String"
     Description: Port Number
+    Default: "3307"
   DBNameP:
     Type: "String"
     Description: DataBase Name
+    Default: "thanosregional"
 
 Resources:
   LayerDataWrangler:
@@ -269,21 +286,17 @@ Resources:
         - AttributeName: "fecha_hora"
           KeyType: RANGE
 
-  DynamoDBContorlDeltas:
+  DynamoDBControlExtract:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: logDeltas
+      TableName: controlExtract
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: "fecha"
-          AttributeType: "S"
-        - AttributeName: "hora"
+        - AttributeName: "type"
           AttributeType: "S"
       KeySchema:
-        - AttributeName: "fecha"
+        - AttributeName: "type"
           KeyType: HASH
-        - AttributeName: "hora"
-          KeyType: RANGE
 
   DynamoDBFiltros:
     Type: AWS::DynamoDB::Table
@@ -1289,7 +1302,7 @@ Resources:
           TargetOriginId: !Sub "front-ar-thanos-reg-${env}"
           ViewerProtocolPolicy: "allow-all"
           FunctionAssociations:
-            - EventType: viewer-request
+            - EventType: viewer-response
               FunctionARN: !GetAtt SHThanosAr.FunctionMetadata.FunctionARN
         Comment: !Sub "Cloudfront Distribution - ar-thanos-reg-${env}"
         DefaultRootObject: "index.html"
@@ -1315,7 +1328,7 @@ Resources:
           TargetOriginId: !Sub "front-py-thanos-reg-${env}"
           ViewerProtocolPolicy: "allow-all"
           FunctionAssociations:
-            - EventType: viewer-request
+            - EventType: viewer-response
               FunctionARN: !GetAtt SHThanosPy.FunctionMetadata.FunctionARN
         Comment: !Sub "Cloudfront Distribution - py-thanos-reg-${env}"
         DefaultRootObject: "index.html"
@@ -1676,7 +1689,7 @@ Resources:
       DBInstanceClass: "db.r5.large"
       DBInstanceIdentifier: !Ref InstanceIdentifierP
       DBName: !Ref DBNameP
-      DBSubnetGroupName: !Ref VpcSG
+      DBSubnetGroupName: !Ref SubnetGroupRDS
       DeletionProtection: True
       EnableCloudwatchLogsExports:
         - "error"
@@ -1698,7 +1711,16 @@ Resources:
     Properties:
       Description: Secrets Manager para Thanos Regional
       Name: !Ref InstanceIdentifierP
-      SecretString: !Sub '{"username" : "${UserNameP}","pass": "${UserPasswordP}", "engine": "mysql", "host": "${MySQLRdsInstance.Endpoint.Address}", "port": "${PortNumberP}", "dbname": "${DBNameP}", "dbInstanceIdentifier": "${InstanceIdentifierP}"}'
+      SecretString: !Sub '{"username" : "${UserNameP}","password": "${UserPasswordP}", "engine": "mysql", "host": "${MySQLRdsInstance.Endpoint.Address}", "port": "${PortNumberP}", "dbname": "${DBNameP}", "dbInstanceIdentifier": "${InstanceIdentifierP}"}'
+
+  SubnetGroupRDS:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Created for the RDS
+      DBSubnetGroupName: subnet-rds
+      SubnetIds:
+        - !ImportValue vpc-devregional-thanos-PrivateSubnet1AID
+        - !ImportValue vpc-devregional-thanos-PrivateSubnet2AID
 
 Outputs:
   LambdaDateupdateApiA:
