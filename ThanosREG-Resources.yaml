@@ -39,6 +39,45 @@ Parameters:
     Type: "String"
     Description: URL respuesta microsoft AD-Cognito
     Default: "https://login.microsoftonline.com/url"
+  SubscriptionEndPoint1:
+    Type: String
+    Description: The endpoint 1 that receives notifications
+  SubscriptionEndPoint2:
+    Type: String
+    Description: The endpoint 2 that receives notifications
+  SubscriptionProtocol:
+    Type: String
+    Description: The subscription protocol
+    AllowedValues:
+      - http
+      - https
+      - email
+      - email-json
+      - sms
+      - sqs
+      - application
+      - lambda
+    Default: email
+  TopicNameApis:
+    Type: "String"
+    Description: Topic Name APIs
+    Default: "apis-execution-errors"
+  TopicNameETL:
+    Type: "String"
+    Description: Topic Name ETL
+    Default: "etl-execution-errors"
+  TopicNameModels:
+    Type: "String"
+    Description: Topic Name Models
+    Default: "models-execution-errors"
+  TopicNameIngestion:
+    Type: "String"
+    Description: Topic Name Ingestion
+    Default: "ingestion-execution-errors"
+  TopicNameOrchestration:
+    Type: "String"
+    Description: Topic Name Orchestration
+    Default: "orchestration-execution-errors"
 
 Resources:
   LayerDataWrangler:
@@ -1571,6 +1610,57 @@ Resources:
     Properties:
       Domain: !Sub "thanosreg-py-${env}" #!Sub 'SSORegPy-${env}'
       UserPoolId: !Ref cognitoUserPoolPy
+
+  #SNS
+  SNSApisNotify:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${TopicNameApis}"
+      Subscription:
+        - Protocol: !Ref SubscriptionProtocol
+          Endpoint: !Ref SubscriptionEndPoint1
+        - Protocol: !Ref SubscriptionProtocol
+          Endpoint: !Ref SubscriptionEndPoint2
+
+  SNSEtlNotify:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${TopicNameETL}"
+      Subscription:
+        - Protocol: !Ref SubscriptionProtocol
+          Endpoint: !Ref SubscriptionEndPoint1
+        - Protocol: !Ref SubscriptionProtocol
+          Endpoint: !Ref SubscriptionEndPoint2
+
+  SNSModelsNotify:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${TopicNameModels}"
+      Subscription:
+        - Protocol: !Ref SubscriptionProtocol
+          Endpoint: !Ref SubscriptionEndPoint1
+        - Protocol: !Ref SubscriptionProtocol
+          Endpoint: !Ref SubscriptionEndPoint2
+
+  SNSIngestionNotify:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${TopicNameIngestion}"
+      Subscription:
+        - Protocol: !Ref SubscriptionProtocol
+          Endpoint: !Ref SubscriptionEndPoint1
+        - Protocol: !Ref SubscriptionProtocol
+          Endpoint: !Ref SubscriptionEndPoint2
+
+  SNSOrchestrationNotify:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${TopicNameOrchestration}"
+      Subscription:
+        - Protocol: !Ref SubscriptionProtocol
+          Endpoint: !Ref SubscriptionEndPoint1
+        - Protocol: !Ref SubscriptionProtocol
+          Endpoint: !Ref SubscriptionEndPoint2
 
 Outputs:
   LambdaDateupdateApiA:
