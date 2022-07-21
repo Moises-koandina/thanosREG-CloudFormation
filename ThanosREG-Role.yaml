@@ -124,8 +124,7 @@ Resources:
                   - secretsmanager:*
                 Effect: Allow
                 Resource:
-                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:extractor/*
-                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:mysqlthanosreg*
+                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*
           PolicyName: !Sub KOAndina-${AWS::StackName}-SecretManagerSAPExtractorPolicy
         #glue
         - PolicyDocument:
@@ -237,8 +236,7 @@ Resources:
                   - secretsmanager:*
                 Effect: Allow
                 Resource:
-                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:extractor/*
-                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:mysqlthanosreg*
+                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*
           PolicyName: !Sub KOAndina-${AWS::StackName}-SecretManagerModelsPolicy
         - PolicyDocument:
             Version: "2012-10-17"
